@@ -117,11 +117,19 @@ window.LEADERSHIP_DATA = [
     positionAliases: [
       "15th Sig BGE Commander",
       "15th Signal Brigade Commander",
+      "Signal Brigade Commander",
+      "15th Signal Bridgade Commander",
+      "15th Signal BDE Commander",
+      "15th Sig BDE Commander",
       "Brigade Commander"
     ],
     acceptedAnswers: [
       "COL Benjamin Schneller 15th Sig BGE Commander",
-      "Colonel Benjamin Schneller 15th Signal Brigade Commander"
+      "Colonel Benjamin Schneller 15th Signal Brigade Commander",
+      "COL Benjamin Schneller Signal Brigade Commander",
+      "COL Benjamin Schneller 15th Signal Bridgade Commander",
+      "COL Benjamin Schneller 15th Signal BDE Commander",
+      "COL Benjamin Schneller Brigade Commander"
     ]
   },
   {
