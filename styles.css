@@ -1016,6 +1016,31 @@ body:has(#menuView:not([hidden])) .subtitle {
   color: #253746;
 }
 
+.unofficial-notice {
+  margin-top: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-left: 5px solid #7a1f1f;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.56);
+  color: #18232d;
+  padding: 12px 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.unofficial-notice strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.unofficial-notice p {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
 /* Mode selection and Phase 6 / Phase 6+ additions */
 .mode-badge {
   border: 1px solid #1769c2;
