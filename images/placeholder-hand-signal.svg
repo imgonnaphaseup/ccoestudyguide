@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="500" viewBox="0 0 700 500">
+  <rect width="700" height="500" fill="#f5f7f9"/>
+  <rect x="20" y="20" width="660" height="460" rx="16" fill="none" stroke="#9eaab3" stroke-width="3" stroke-dasharray="12 10"/>
+  <path d="M290 360V205c0-22 34-22 34 0v87-132c0-22 34-22 34 0v126-148c0-22 34-22 34 0v148-117c0-22 34-22 34 0v145l26-37c13-18 43 1 32 21l-61 111c-13 23-37 37-64 37h-39c-60 0-110-49-110-110z" fill="#c8d0d7" stroke="#8d9ca8" stroke-width="4"/>
+  <text x="350" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#52606d">Add hand-signal image</text>
+</svg>

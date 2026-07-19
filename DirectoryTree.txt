@@ -1,0 +1,76 @@
+﻿Folder PATH listing for volume Windows
+Volume serial number is 000002A8 6A93:5FC0
+C:\USERS\FRANC\DOWNLOADS\CYBER-STUDY-TEST-PHASE-MODES\CYBER-STUDY-TEST
+|   app-js-code.txt
+|   app.js
+|   DirectoryTree.txt
+|   index.html
+|   map.ps1
+|   OPEN-TEST.bat
+|   README.md
+|   styles.css
+|   
++---data
+|       army-values.js
+|       general-knowledge.js
+|       hand-signals.js
+|       leadership.js
+|       map-colors.js
+|       mottos.js
+|       movement-drills.js
+|       terrain-features.js
+|       true-false.js
+|       
+\---images
+    |   placeholder-hand-signal.svg
+    |   placeholder-person.svg
+    |   
+    +---favico
+    |       army logo.png
+    |       background.png
+    |       
+    +---hand-signals
+    |       danger area.png
+    |       freeze.png
+    |       halt.png
+    |       head count.png
+    |       map check.png
+    |       pace count.png
+    |       quicktime.png
+    |       README.txt
+    |       wedge.png
+    |       
+    +---leadership
+    |       1SG Travis Oyler.jpg
+    |       Col Benjamin Schneller.png
+    |       CPT Michael Everson.jpg
+    |       CSM Carlos De La Cruz.png
+    |       CSM Nathaniel Piper.png
+    |       CSM Raymond Harris.png
+    |       CSM Timothy McGuire.png
+    |       Donald Trump.png
+    |       General Christopher Laneve.png
+    |       Honorable Daniel Driscoll.png
+    |       Honorable Pete Hegseth.png
+    |       LTC Richard L Byr ne.png
+    |       LTG Edmond Brown.png
+    |       MG Ryan M Janovic.png
+    |       README.txt
+    |       SMA Michael R Weimer.png
+    |       
+    +---misc
+    |       background.png
+    |       usa army logo.jpg
+    |       
+    \---terrain-features
+            cliff.png
+            cut.png
+            depression.png
+            draw.png
+            fill.png
+            hill.png
+            ridge.png
+            saddle.png
+            spur.png
+            valley.png
+            

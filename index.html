@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCOE Study Test</title>
+  <link rel="icon" type="image/png" href="images/favico/army logo.png">
+  <link rel="shortcut icon" type="image/png" href="images/favico/army logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-text">
+      <p class="eyebrow">Cyber Center of Excellence</p>
+      <h1>Randomized Study Test</h1>
+      <p class="subtitle">Questions are randomized inside each section. Sections remain in order.</p>
+      <p class="creator-credit">Created by PVT Anthony Franco any inquries please email gggvgghjghjnvc@gmail.com</p>
+    </div>
+
+    <div class="header-branding">
+      <div id="currentModeBadge" class="mode-badge" hidden></div>
+      <img
+        class="header-army-logo"
+        src="images/misc/usa army logo.jpg"
+        alt="United States Army logo"
+        width="92"
+        height="92"
+      >
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section id="menuView" class="menu-view">
+      <div class="menu-panel">
+        <p class="eyebrow">Choose your test mode</p>
+        <h2>Start a New Test</h2>
+        <p class="menu-introduction">Select Phase 6 for recognition practice or Phase 6+ for harder recall practice.</p>
+
+        <div class="mode-grid">
+          <article class="mode-card">
+            <div>
+              <h3>Phase 6</h3>
+              <p>Leadership and terrain-feature pictures use dropdowns. Sections 4, 6, and 8 remain multiple choice.</p>
+            </div>
+            <button id="phase6Button" class="primary-button mode-start-button" type="button">Start Phase 6</button>
+          </article>
+
+          <article class="mode-card mode-card-advanced">
+            <div>
+              <h3>Phase 6+</h3>
+              <p>Leadership and terrain-feature pictures require typed answers. Up to 25% of each multiple-choice section becomes fill in the blank.</p>
+            </div>
+            <button id="phase6PlusButton" class="primary-button mode-start-button" type="button">Start Phase 6+</button>
+          </article>
+        </div>
+
+        <button id="previousAttemptsButton" class="secondary-button previous-attempts-button" type="button">Previous Attempts</button>
+      </div>
+    </section>
+
+    <section id="testView" class="quiz-layout" hidden>
+      <div class="quiz-main-column">
+
+        <div id="testContainer"></div>
+
+        <section id="finalSummary" class="final-summary" hidden>
+          <h2>Test Summary</h2>
+          <div id="summaryContent"></div>
+        </section>
+
+        <section id="submitPanel" class="submit-panel">
+          <h2>Finish the test</h2>
+          <p id="submitStatus">You may submit at any time. Answered questions that were not checked will be graded automatically.</p>
+          <button id="submitTestButton" class="primary-button" type="button">Submit Test</button>
+        </section>
+      </div>
+
+      <aside id="quizNavigation" class="quiz-navigation" aria-label="Quiz navigation">
+        <div class="quiz-navigation-card">
+          <div class="navigation-heading-row">
+            <h2>Quiz navigation</h2>
+            <button id="closeNavigationButton" class="navigation-close-button" type="button" aria-label="Hide quiz navigation">×</button>
+          </div>
+          <div id="navigationGrid" class="navigation-grid"></div>
+          <div class="navigation-links">
+            <button id="goToSubmitButton" class="navigation-text-button" type="button">Go to Submit Test</button>
+            <button id="returnToMenuButton" class="navigation-text-button" type="button">Return to Mode Selection</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <button id="showNavigationButton" class="show-navigation-button" type="button" hidden>Show quiz navigation</button>
+
+    <section id="attemptsView" class="history-view" hidden>
+      <div class="history-heading">
+        <div>
+          <p class="eyebrow">Saved locally on this device</p>
+          <h2>Test Attempts</h2>
+          <p>Open an attempt to review every correct and incorrect answer.</p>
+        </div>
+        <button id="newTestButton" class="primary-button" type="button">Take a New Test</button>
+      </div>
+      <div id="attemptsList" class="attempts-list"></div>
+    </section>
+
+    <section id="reviewView" class="review-view" hidden>
+      <div class="review-toolbar">
+        <button id="backToAttemptsButton" class="secondary-button" type="button">← Back to Attempts</button>
+        <button id="newTestFromReviewButton" class="primary-button" type="button">Take a New Test</button>
+      </div>
+      <div id="reviewContent"></div>
+    </section>
+  </main>
+
+  <template id="questionTemplate">
+    <article class="question-row">
+      <aside class="question-sidebar">
+        <strong class="question-number"></strong>
+        <div class="question-state question-state-pending">
+          <span>Tries remaining:</span>
+          <strong class="tries-remaining">1</strong>
+          <span>Marked out of</span>
+          <strong>1.00</strong>
+        </div>
+        <div class="question-state question-state-graded" hidden>
+          <strong class="grade-label"></strong>
+          <span>Mark <strong class="grade-score"></strong> out of</span>
+          <strong>1.00</strong>
+        </div>
+        <button class="flag-button" type="button" aria-pressed="false">⚑ Flag question</button>
+      </aside>
+
+      <div class="question-content-column">
+        <section class="question-card">
+          <div class="question-prompt"></div>
+          <div class="question-media"></div>
+          <div class="answer-area"></div>
+          <button class="check-button" type="button">Check</button>
+        </section>
+        <div class="answer-feedback" hidden></div>
+      </div>
+    </article>
+  </template>
+
+  <script src="data/leadership.js"></script>
+  <script src="data/mottos.js"></script>
+  <script src="data/army-values.js"></script>
+  <script src="data/map-colors.js"></script>
+  <script src="data/terrain-features.js"></script>
+  <script src="data/movement-drills.js"></script>
+  <script src="data/true-false.js"></script>
+  <script src="data/general-knowledge.js"></script>
+  <script src="data/hand-signals.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
