@@ -1,5 +1,5 @@
 # Cyber Center of Excellence Randomized Study Test
-made mostly by chatgpt for independent study
+
 ## Open the test
 
 Double-click `index.html` or `OPEN-TEST.bat`. The test works locally and does not require installation or internet access.

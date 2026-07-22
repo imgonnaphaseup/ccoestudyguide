@@ -1,0 +1,2 @@
+Add the 29 PNG files listed in ../../RANK-IMAGE-FILENAMES.txt to this folder.
+Use the exact lowercase filenames because GitHub Pages paths are case-sensitive.

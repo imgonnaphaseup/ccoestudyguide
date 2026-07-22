@@ -1,0 +1,37 @@
+﻿Folder PATH listing for volume Windows
+Volume serial number is 000002B7 6A93:5FC0
+C:\USERS\FRANC\DOWNLOADS\CYBER-STUDY-TEST-PHASE-MODES\CYBER-STUDY-TEST\IMAGES\RANKS
+    1lt.png
+    1sg.png
+    2lt.png
+    ADD-RANK-IMAGES-HERE.txt
+    bg.png
+    col.png
+    cpl.png
+    cpt.png
+    csm.png
+    cw2.png
+    cw3.png
+    cw4.png
+    cw5.png
+    DirectoryTree.txt
+    ga.png
+    gen.png
+    ltc.png
+    ltg.png
+    maj.png
+    map.ps1
+    mg.png
+    msg.png
+    pfc.png
+    pv1.png
+    pv2.png
+    sfc.png
+    sgm.png
+    sgt.png
+    sma.png
+    ssg.png
+    wo1.png
+    
+No subfolders exist 
+

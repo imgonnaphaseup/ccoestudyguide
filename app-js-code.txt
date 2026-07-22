@@ -3,7 +3,8 @@
 
   const PASS_REQUIREMENTS = {
     leadership: 15,
-    mottos: 4
+    mottos: 4,
+    ranks: 29
   };
 
   const ATTEMPT_STORAGE_KEY = "cyberStudyTestAttemptsV2";
@@ -40,12 +41,12 @@
     {
       id: "terrain-features",
       title: "Section 5: Terrain Features",
-      type: "text",
+      type: "terrain",
       data: window.TERRAIN_FEATURE_DATA || []
     },
     {
       id: "movement-drills",
-      title: "Section 6: Military Movement Drills",
+      title: "Section 6: Preparation Drill, Recovery Drill, MMD1, and MMD2 (ATP 7-22.02)",
       type: "multiple-choice",
       data: window.MOVEMENT_DRILL_DATA || []
     },
@@ -63,11 +64,33 @@
     },
     {
       id: "hand-signals",
-      title: "Section 9: Hand-Signal Picture Identification",
+      title: "Section 9: Hand-Signal Picture Identification (TC 3-21.60)",
       type: "hand-signal",
       data: window.HAND_SIGNAL_DATA || []
+    },
+    {
+      id: "ranks",
+      title: "Section 10: Army Rank Picture Identification",
+      type: "rank",
+      modes: [PHASE_6],
+      data: window.RANK_DATA || []
+    },
+    {
+      id: "sharp-eo",
+      title: "Section 11: SHARP and EO (AR 600-20)",
+      type: "multiple-choice",
+      modes: [PHASE_6],
+      data: window.SHARP_EO_DATA || []
     }
   ];
+
+  function sectionEnabledForMode(section, mode = state.mode) {
+    return !section.modes || section.modes.includes(mode);
+  }
+
+  function activeSectionDefinitions(mode = state.mode) {
+    return sectionDefinitions.filter((section) => sectionEnabledForMode(section, mode));
+  }
 
   const menuView = document.getElementById("menuView");
   const testView = document.getElementById("testView");
@@ -81,7 +104,6 @@
   const questionTemplate = document.getElementById("questionTemplate");
   const finalSummary = document.getElementById("finalSummary");
   const summaryContent = document.getElementById("summaryContent");
-  const requirementsGrid = document.getElementById("requirementsGrid");
   const navigationGrid = document.getElementById("navigationGrid");
   const quizNavigation = document.getElementById("quizNavigation");
   const closeNavigationButton = document.getElementById("closeNavigationButton");
@@ -105,7 +127,8 @@
     questions: [],
     submitted: false,
     observer: null,
-    currentQuestionNumber: null
+    currentQuestionNumber: null,
+    navigationSections: new Map()
   };
 
   function shuffle(items) {
@@ -122,6 +145,8 @@
       .toLowerCase()
       .replace(/&/g, "and")
       .replace(/[’']/g, "")
+      .replace(/([a-z])([0-9])/g, "$1 $2")
+      .replace(/([0-9])([a-z])/g, "$1 $2")
       .replace(/[^a-z0-9]+/g, " ")
       .trim()
       .replace(/\s+/g, " ");
@@ -142,50 +167,288 @@
     return "Previous Version";
   }
 
+
+  const NUMBER_WORD_VALUES = {
+    zero: 0,
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    ten: 10,
+    eleven: 11,
+    twelve: 12,
+    thirteen: 13,
+    fourteen: 14,
+    fifteen: 15,
+    sixteen: 16,
+    seventeen: 17,
+    eighteen: 18,
+    nineteen: 19,
+    twenty: 20,
+    thirty: 30,
+    forty: 40,
+    fifty: 50,
+    sixty: 60,
+    seventy: 70,
+    eighty: 80,
+    ninety: 90
+  };
+
+  const OPTIONAL_ANSWER_WORDS = new Set([
+    "a", "an", "the", "and", "or", "of", "to", "is", "are", "was", "were",
+    "it", "they", "may", "be", "that", "which", "for", "in", "on", "at",
+    "week", "weeks", "meter", "meters", "pace", "paces", "hour", "hours",
+    "minute", "minutes", "centimeter", "centimeters", "cm", "inch", "inches",
+    "paint", "color", "colors"
+  ]);
+
+  const RANK_ALIASES = {
+    president: ["president"],
+    honorable: ["honorable", "hon"],
+    general: ["general", "gen"],
+    sma: ["sma", "sergeant major of the army"],
+    ltg: ["ltg", "lieutenant general"],
+    csm: ["csm", "command sergeant major"],
+    mg: ["mg", "major general"],
+    col: ["col", "colonel"],
+    ltc: ["ltc", "lieutenant colonel"],
+    cpt: ["cpt", "captain"],
+    "1 sg": ["1sg", "1 sg", "first sergeant"]
+  };
+
+  function normalizeNumberWords(value) {
+    const tokens = normalize(value).split(" ").filter(Boolean);
+    const converted = [];
+    let index = 0;
+
+    while (index < tokens.length) {
+      if (!(tokens[index] in NUMBER_WORD_VALUES)) {
+        converted.push(tokens[index]);
+        index += 1;
+        continue;
+      }
+
+      let current = 0;
+      let total = 0;
+      let cursor = index;
+      let usedNumberWord = false;
+
+      while (cursor < tokens.length) {
+        const token = tokens[cursor];
+
+        if (token === "and" && usedNumberWord && cursor + 1 < tokens.length
+          && tokens[cursor + 1] in NUMBER_WORD_VALUES) {
+          cursor += 1;
+          continue;
+        }
+
+        if (token in NUMBER_WORD_VALUES) {
+          current += NUMBER_WORD_VALUES[token];
+          usedNumberWord = true;
+          cursor += 1;
+          continue;
+        }
+
+        if (token === "hundred" && usedNumberWord) {
+          current = (current || 1) * 100;
+          cursor += 1;
+          continue;
+        }
+
+        if (token === "thousand" && usedNumberWord) {
+          total += (current || 1) * 1000;
+          current = 0;
+          cursor += 1;
+          continue;
+        }
+
+        break;
+      }
+
+      if (!usedNumberWord) {
+        converted.push(tokens[index]);
+        index += 1;
+      } else {
+        converted.push(String(total + current));
+        index = cursor;
+      }
+    }
+
+    return converted.join(" ");
+  }
+
+  function canonicalAnswer(value) {
+    return normalizeNumberWords(value);
+  }
+
+  function significantTokens(value) {
+    return canonicalAnswer(value)
+      .split(" ")
+      .filter((token) => token && !OPTIONAL_ANSWER_WORDS.has(token));
+  }
+
+  function phraseTokensIncluded(userValue, expectedValue) {
+    const userTokens = new Set(significantTokens(userValue));
+    const expectedTokens = significantTokens(expectedValue);
+    return expectedTokens.length > 0 && expectedTokens.every((token) => userTokens.has(token));
+  }
+
+  function orderedItemsIncluded(userValue, requiredItems) {
+    const normalizedUser = canonicalAnswer(userValue);
+    let searchFrom = 0;
+
+    return requiredItems.every((item) => {
+      const normalizedItem = canonicalAnswer(item);
+      const foundAt = normalizedUser.indexOf(normalizedItem, searchFrom);
+      if (foundAt === -1) return false;
+      searchFrom = foundAt + normalizedItem.length;
+      return true;
+    });
+  }
+
+  function automaticAnswerVariants(value) {
+    const raw = String(value ?? "").trim();
+    const variants = new Set();
+    if (!raw) return variants;
+
+    const add = (candidate) => {
+      const normalized = canonicalAnswer(candidate);
+      if (normalized) variants.add(normalized);
+    };
+
+    add(raw);
+    add(raw.replace(/\s*\([^)]*\)/g, ""));
+
+    for (const match of raw.matchAll(/\(([^)]+)\)/g)) {
+      add(match[1]);
+    }
+
+    raw.split(";").forEach(add);
+
+    const daForm = raw.match(/^DA\s+Form\s+(.+)$/i);
+    if (daForm) {
+      add(`DA ${daForm[1]}`);
+      add(daForm[1]);
+    }
+
+    const daPam = raw.match(/^DA\s+Pam(?:phlet)?\s+(.+)$/i);
+    if (daPam) {
+      add(`DA PAM ${daPam[1]}`);
+      add(daPam[1]);
+    }
+
+    const canonical = canonicalAnswer(raw);
+    const unitOnly = canonical.match(/^(\d+)\s+(?:week|weeks|meter|meters|pace|paces|hour|hours|minute|minutes|centimeter|centimeters|cm|inch|inches)$/);
+    if (unitOnly) add(unitOnly[1]);
+
+    [
+      "they may not ",
+      "it may not ",
+      "not to ",
+      "only ",
+      "the correct answer is "
+    ].forEach((prefix) => {
+      if (canonical.startsWith(prefix)) add(canonical.slice(prefix.length));
+    });
+
+    return variants;
+  }
+
   function acceptedTextAnswers(question) {
-    return [question.answer, ...(question.acceptedAnswers || [])]
-      .filter(Boolean)
-      .map(normalize);
+    const answers = [question.answer, ...(question.acceptedAnswers || [])].filter(Boolean);
+    const variants = new Set();
+    answers.forEach((answer) => automaticAnswerVariants(answer).forEach((variant) => variants.add(variant)));
+    return [...variants];
   }
 
   function isTextCorrect(question, userAnswer) {
-    const normalizedUserAnswer = normalize(userAnswer);
+    const normalizedUserAnswer = canonicalAnswer(userAnswer);
     if (!normalizedUserAnswer) return false;
 
     if (question.answerType === "unordered-list") {
       const requiredItems = question.requiredItems || [];
-      return requiredItems.every((item) => normalizedUserAnswer.includes(normalize(item)));
+      return requiredItems.every((item) => phraseTokensIncluded(normalizedUserAnswer, item));
     }
 
-    return acceptedTextAnswers(question).includes(normalizedUserAnswer);
+    if (question.answerType === "ordered-list") {
+      return orderedItemsIncluded(normalizedUserAnswer, question.requiredItems || []);
+    }
+
+    const acceptedAnswers = acceptedTextAnswers(question);
+    if (acceptedAnswers.includes(normalizedUserAnswer)) return true;
+
+    return acceptedAnswers.some((answer) => {
+      const expectedTokens = significantTokens(answer);
+      return expectedTokens.length >= 2 && phraseTokensIncluded(normalizedUserAnswer, answer);
+    });
+  }
+
+  function isRankCorrect(question, userAnswer) {
+    const normalizedUserAnswer = canonicalAnswer(userAnswer);
+    if (!normalizedUserAnswer) return false;
+
+    const possibleAnswers = [
+      question.abbreviation,
+      ...(question.requireGrade ? [] : [question.name]),
+      ...(question.acceptedAnswers || [])
+    ];
+
+    return possibleAnswers
+      .filter(Boolean)
+      .some((answer) => canonicalAnswer(answer) === normalizedUserAnswer);
+  }
+
+  function rankAliasesFor(rank) {
+    const normalizedRank = normalize(rank);
+    return RANK_ALIASES[normalizedRank] || [rank];
   }
 
   function isLeadershipTypedCorrect(question, userAnswer) {
-    const normalizedUserAnswer = normalize(userAnswer);
+    const normalizedUserAnswer = canonicalAnswer(userAnswer);
     if (!normalizedUserAnswer) return false;
 
-    const containsCoreFields = [question.name, question.rank, question.position]
-      .every((field) => normalizedUserAnswer.includes(normalize(field)));
+    const explicitlyAccepted = (question.acceptedAnswers || [])
+      .some((answer) => canonicalAnswer(answer) === normalizedUserAnswer);
+    if (explicitlyAccepted) return true;
 
-    const extraAccepted = (question.acceptedAnswers || [])
-      .map(normalize)
-      .includes(normalizedUserAnswer);
+    const requiredNameTokens = normalize(question.name)
+      .split(" ")
+      .filter((token) => token.length > 1);
+    const userTokens = new Set(normalizedUserAnswer.split(" "));
+    const lastNameToken = requiredNameTokens.at(-1);
+    const hasFullName = requiredNameTokens.every((token) => userTokens.has(token));
+    const hasCorrectName = hasFullName || Boolean(lastNameToken && userTokens.has(lastNameToken));
 
-    return containsCoreFields || extraAccepted;
+    const hasCorrectRank = rankAliasesFor(question.rank)
+      .some((alias) => phraseTokensIncluded(normalizedUserAnswer, alias));
+
+    const positionAliases = [question.position, ...(question.positionAliases || [])];
+    const hasCorrectPosition = positionAliases
+      .some((alias) => phraseTokensIncluded(normalizedUserAnswer, alias));
+
+    return hasCorrectName && hasCorrectRank && hasCorrectPosition;
   }
 
   function isHandSignalCorrect(question, userAnswer) {
-    const possibleAnswers = [question.answer, question.description, ...(question.acceptedAnswers || [])]
-      .filter(Boolean)
-      .map(normalize);
-    return possibleAnswers.includes(normalize(userAnswer));
+    return isTextCorrect({
+      ...question,
+      acceptedAnswers: [question.description, ...(question.acceptedAnswers || [])].filter(Boolean)
+    }, userAnswer);
   }
 
   function correctAnswerText(question, sectionType) {
     if (sectionType === "leadership") {
       return `${question.rank} ${question.name} — ${question.position}`;
     }
-    if (sectionType === "hand-signal" && question.description) {
+    if (sectionType === "rank") {
+      return `${question.name} (${question.abbreviation})`;
+    }
+    if ((sectionType === "hand-signal" || sectionType === "terrain") && question.description) {
       return `${question.answer} — ${question.description}`;
     }
     return question.answer;
@@ -198,8 +461,8 @@
   function sectionDescription(section, fillBlankCount = 0) {
     if (section.id === "leadership") {
       return state.mode === PHASE_6
-        ? "Select each person's full first and last name from the dropdown. Required score: 15 out of 15."
-        : "Type each person's full first and last name, rank, and position. Required score: 15 out of 15.";
+        ? "Select the correct rank and full name from the word bank. Fake names and ranks are included. Required score: 15 out of 15."
+        : "Type the person's rank or title, last name or full name, and position. Required score: 15 out of 15.";
     }
     if (section.id === "mottos") {
       return "Type the correct motto. Required score: 4 out of 4.";
@@ -208,13 +471,26 @@
       return "Fill in each blank.";
     }
     if (section.id === "terrain-features") {
-      return "Fill in each answer. List order and capitalization do not matter.";
+      return state.mode === PHASE_6
+        ? "Complete the terrain knowledge questions and identify each terrain-feature picture from a dropdown."
+        : "Complete the terrain knowledge questions and type the name of each terrain feature shown.";
     }
     if (section.id === "true-false") {
       return "Select True or False.";
     }
     if (section.id === "hand-signals") {
       return "Identify or describe the hand signal shown.";
+    }
+    if (section.id === "ranks") {
+      return "Type the abbreviation or full name of every Army rank shown. Required score: 29 out of 29. This section appears only in Phase 6.";
+    }
+    if (section.id === "sharp-eo") {
+      return "Answer the SHARP and EO questions. This section appears only in Phase 6.";
+    }
+    if (section.id === "movement-drills") {
+      return state.mode === PHASE_6_PLUS
+        ? `${fillBlankCount} out of ${section.data.length} drill questions were randomly changed to fill in the blank.`
+        : "Multiple choice questions cover the Preparation Drill, Recovery Drill, MMD1, and MMD2.";
     }
     if (section.type === "multiple-choice" && state.mode === PHASE_6_PLUS) {
       return `${fillBlankCount} out of ${section.data.length} questions were randomly changed to fill in the blank. All other questions are multiple choice.`;
@@ -228,11 +504,19 @@
   function promptText(question, sectionType, renderType) {
     if (sectionType === "leadership") {
       return renderType === "leadership-dropdown"
-        ? "Identify the person shown by selecting the correct full first and last name."
-        : "Identify the person shown. Type the full first and last name, rank, and position within the Cyber Center of Excellence.";
+        ? "Identify the person shown by selecting the correct rank and full name."
+        : "Identify the person shown. Type the rank or title, last name or full name, and position.";
     }
     if (sectionType === "hand-signal") {
       return "Identify or describe the hand signal shown.";
+    }
+    if (sectionType === "rank") {
+      return "Identify the Army rank insignia shown. Type the rank abbreviation or full rank name.";
+    }
+    if (sectionType === "terrain" && question.image) {
+      return renderType === "terrain-dropdown"
+        ? "Identify the terrain feature shown by selecting its name."
+        : "Identify the terrain feature shown.";
     }
     if (renderType === "fill-blank") {
       return getFillBlankPrompt(question);
@@ -292,7 +576,64 @@
     select.append(placeholder);
 
     const leadershipSection = sectionDefinitions.find((section) => section.id === "leadership");
-    const names = [...new Set((leadershipSection?.data || []).map((person) => person.name).filter(Boolean))];
+    const people = (leadershipSection?.data || [])
+      .filter((person) => person.name && person.rank)
+      .map((person) => ({
+        name: person.name,
+        label: `${person.rank} ${person.name}`
+      }));
+
+    const distractors = [
+      { name: "__fake_1", label: "CSM Marcus Thompson" },
+      { name: "__fake_2", label: "LTC Andrew Reynolds" },
+      { name: "__fake_3", label: "CPT Jordan Ellis" },
+      { name: "__fake_4", label: "MG Robert Wallace" },
+      { name: "__fake_5", label: "SFC Daniel Carter" },
+      { name: "__fake_6", label: "COL James Whitaker" },
+      { name: "__fake_7", label: "1SG Kevin Brooks" },
+      { name: "__fake_8", label: "LTG Samuel Price" }
+    ];
+
+    shuffle([...people, ...distractors]).forEach((person) => {
+      const option = document.createElement("option");
+      option.value = person.name;
+      option.textContent = person.label;
+      select.append(option);
+    });
+
+    select.name = questionKey;
+
+    const statusIcon = document.createElement("span");
+    statusIcon.className = "answer-status-icon";
+    statusIcon.setAttribute("aria-hidden", "true");
+
+    row.append(select, statusIcon);
+    return row;
+  }
+
+
+  function createTerrainDropdown(questionKey) {
+    const row = document.createElement("div");
+    row.className = "inline-fill-row";
+
+    const select = document.createElement("select");
+    select.className = "answer-select wide";
+    select.dataset.role = "terrain-select";
+    select.setAttribute("aria-label", "Select the terrain feature");
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select a terrain feature";
+    placeholder.selected = true;
+    placeholder.disabled = true;
+    select.append(placeholder);
+
+    const terrainSection = sectionDefinitions.find((section) => section.id === "terrain-features");
+    const names = [...new Set((terrainSection?.data || [])
+      .filter((item) => item.image)
+      .map((item) => item.answer)
+      .filter(Boolean))];
+
     shuffle(names).forEach((name) => {
       const option = document.createElement("option");
       option.value = name;
@@ -345,113 +686,97 @@
     return list;
   }
 
-  function sectionShortTitle(section) {
-    return section.title.replace(/^Section\s+\d+:\s*/, "");
+
+  function readQuestionResponse({ question, renderType, answerArea }) {
+    let selectedAnswer = "";
+    let hasAnswer = true;
+    let correct = false;
+
+    if (["text", "leadership-text", "hand-signal", "terrain-picture", "rank-picture", "fill-blank"].includes(renderType)) {
+      const input = answerArea.querySelector("[data-role='text-answer']");
+      selectedAnswer = input?.value || "";
+      hasAnswer = Boolean(canonicalAnswer(selectedAnswer));
+
+      if (renderType === "leadership-text") {
+        correct = isLeadershipTypedCorrect(question, selectedAnswer);
+      } else if (renderType === "hand-signal") {
+        correct = isHandSignalCorrect(question, selectedAnswer);
+      } else if (renderType === "rank-picture") {
+        correct = isRankCorrect(question, selectedAnswer);
+      } else {
+        correct = isTextCorrect(question, selectedAnswer);
+      }
+    } else if (renderType === "leadership-dropdown") {
+      const select = answerArea.querySelector("[data-role='leadership-select']");
+      selectedAnswer = select?.value || "";
+      hasAnswer = Boolean(canonicalAnswer(selectedAnswer));
+      correct = hasAnswer && canonicalAnswer(selectedAnswer) === canonicalAnswer(question.name);
+    } else if (renderType === "terrain-dropdown") {
+      const select = answerArea.querySelector("[data-role='terrain-select']");
+      selectedAnswer = select?.value || "";
+      hasAnswer = Boolean(canonicalAnswer(selectedAnswer));
+      correct = hasAnswer && canonicalAnswer(selectedAnswer) === canonicalAnswer(question.answer);
+    } else {
+      const selected = answerArea.querySelector("input[type='radio']:checked");
+      hasAnswer = Boolean(selected);
+      selectedAnswer = selected?.value || "";
+      correct = hasAnswer && canonicalAnswer(selectedAnswer) === canonicalAnswer(question.answer);
+    }
+
+    return { selectedAnswer, hasAnswer, correct };
   }
 
-  function renderScoreOverview() {
-    requirementsGrid.innerHTML = "";
-
-    sectionDefinitions.forEach((section) => {
-      const requirement = PASS_REQUIREMENTS[section.id] || null;
-      const displayedTotal = requirement || section.data.length;
-      const card = document.createElement("div");
-      card.className = "requirement-card";
-      card.dataset.overviewCard = section.id;
-
-      const detail = requirement
-        ? `Must earn ${requirement} out of ${requirement}`
-        : `${section.data.length} question${section.data.length === 1 ? "" : "s"} loaded`;
-
-      card.innerHTML = `
-        <span>${escapeHtml(sectionShortTitle(section))}</span>
-        <strong data-overview-score="${escapeHtml(section.id)}">0 out of ${displayedTotal}</strong>
-        <small data-overview-detail="${escapeHtml(section.id)}">${escapeHtml(detail)}</small>
-      `;
-
-      requirementsGrid.append(card);
-    });
-  }
-
-  function updateScoreOverview() {
-    sectionDefinitions.forEach((section) => {
-      const sectionState = state.sections.get(section.id);
-      const requirement = PASS_REQUIREMENTS[section.id] || null;
-      const total = sectionState?.total ?? section.data.length;
-      const graded = sectionState?.graded || 0;
-      const score = sectionState?.score || 0;
-      const displayedTotal = requirement || total;
-
-      const card = requirementsGrid.querySelector(`[data-overview-card="${section.id}"]`);
-      const scoreElement = requirementsGrid.querySelector(`[data-overview-score="${section.id}"]`);
-      const detailElement = requirementsGrid.querySelector(`[data-overview-detail="${section.id}"]`);
-      if (!card || !scoreElement || !detailElement) return;
-
-      scoreElement.textContent = `${score} out of ${displayedTotal}`;
-      scoreElement.classList.remove("pass-label", "fail-label");
-      card.classList.remove("pass-card", "fail-card");
-
-      if (requirement) {
-        const passed = score === requirement && total >= requirement;
-        detailElement.textContent = total < requirement
-          ? `${total} of ${requirement} questions loaded — must earn ${requirement} out of ${requirement}`
-          : `Must earn ${requirement} out of ${requirement}`;
-
-        if (passed) {
-          scoreElement.classList.add("pass-label");
-          card.classList.add("pass-card");
-        } else if (graded > 0) {
-          scoreElement.classList.add("fail-label");
-          card.classList.add("fail-card");
-        }
-        return;
-      }
-
-      detailElement.textContent = `Checked: ${graded} out of ${total}`;
-      const completedPerfectly = total > 0 && graded === total && score === total;
-      const hasIncorrectAnswer = graded > 0 && score < graded;
-
-      if (completedPerfectly) {
-        scoreElement.classList.add("pass-label");
-        card.classList.add("pass-card");
-      } else if (hasIncorrectAnswer) {
-        scoreElement.classList.add("fail-label");
-        card.classList.add("fail-card");
-      }
+  function responseForRecord(record) {
+    return readQuestionResponse({
+      question: record.question,
+      renderType: record.renderType,
+      answerArea: record.answerArea
     });
   }
 
   function updateScores() {
-    updateScoreOverview();
-
     for (const [sectionId, sectionState] of state.sections.entries()) {
       const scoreElement = document.querySelector(`[data-section-score="${sectionId}"]`);
-      if (!scoreElement) continue;
+      if (scoreElement) {
+        const requirement = PASS_REQUIREMENTS[sectionId];
+        let scoreText = `Score: ${sectionState.score} out of ${sectionState.total} — Checked: ${sectionState.graded} out of ${sectionState.total}`;
 
-      const requirement = PASS_REQUIREMENTS[sectionId];
-      let scoreText = `Score: ${sectionState.score} out of ${sectionState.total} — Checked: ${sectionState.graded} out of ${sectionState.total}`;
+        if (requirement) {
+          const passed = sectionState.score === requirement && sectionState.total >= requirement;
+          scoreText += passed ? " — PASSED" : ` — Needs ${requirement} out of ${requirement}`;
+          scoreElement.classList.toggle("pass-label", passed);
+          scoreElement.classList.toggle("fail-label", sectionState.graded > 0 && !passed);
+        }
 
-      if (requirement) {
-        const passed = sectionState.score === requirement && sectionState.total >= requirement;
-        scoreText += passed ? " — PASSED" : ` — Needs ${requirement} out of ${requirement}`;
-        scoreElement.classList.toggle("pass-label", passed);
-        scoreElement.classList.toggle("fail-label", sectionState.graded > 0 && !passed);
+        scoreElement.textContent = scoreText;
       }
 
-      scoreElement.textContent = scoreText;
+      const navigationSection = state.navigationSections.get(sectionId);
+      if (navigationSection) {
+        navigationSection.progress.textContent = `${sectionState.graded}/${sectionState.total} checked`;
+      }
     }
 
-    const remaining = Math.max(0, state.questionCount - state.gradedCount);
-    submitTestButton.disabled = remaining !== 0 || state.questionCount === 0;
-    submitStatus.textContent = remaining === 0 && state.questionCount > 0
-      ? "Every question has been checked. Your test is ready to submit."
-      : `${remaining} question${remaining === 1 ? "" : "s"} still need to be checked before submission.`;
+    const ungradedRecords = state.questions.filter((record) => !record.graded);
+    const answeredNotChecked = ungradedRecords.filter((record) => responseForRecord(record).hasAnswer).length;
+    const unanswered = ungradedRecords.length - answeredNotChecked;
+
+    submitTestButton.disabled = state.questionCount === 0 || state.submitted;
+
+    if (state.questionCount === 0) {
+      submitStatus.textContent = "No questions are loaded.";
+    } else if (ungradedRecords.length === 0) {
+      submitStatus.textContent = "Every question has been checked. Your test is ready to submit.";
+    } else {
+      submitStatus.textContent = `${answeredNotChecked} answered but not checked; ${unanswered} unanswered. You may still submit now.`;
+    }
   }
 
   function revealFinalSummaryIfComplete() {
     if (state.questionCount === 0 || state.gradedCount !== state.questionCount) return;
 
-    const rows = sectionDefinitions.map((section) => {
+    const visibleSections = activeSectionDefinitions();
+    const rows = visibleSections.map((section) => {
       const sectionState = state.sections.get(section.id);
       const requirement = PASS_REQUIREMENTS[section.id];
       let status = "Completed";
@@ -471,12 +796,13 @@
       `;
     }).join("");
 
-    const leadershipState = state.sections.get("leadership");
-    const mottoState = state.sections.get("mottos");
-    const requiredPassed = leadershipState?.score === 15
-      && leadershipState?.total >= 15
-      && mottoState?.score === 4
-      && mottoState?.total >= 4;
+    const requiredPassed = visibleSections
+      .filter((section) => PASS_REQUIREMENTS[section.id])
+      .every((section) => {
+        const sectionState = state.sections.get(section.id);
+        const requirement = PASS_REQUIREMENTS[section.id];
+        return sectionState?.score === requirement && sectionState?.total >= requirement;
+      });
 
     summaryContent.innerHTML = `
       <p><strong>Mode:</strong> ${escapeHtml(modeLabel(state.mode))}</p>
@@ -493,9 +819,85 @@
     finalSummary.hidden = false;
   }
 
+
+  function sectionNumberFor(section) {
+    return activeSectionDefinitions().findIndex((item) => item.id === section.id) + 1;
+  }
+
+  function setNavigationSectionExpanded(sectionId, expanded, collapseOthers = false) {
+    if (collapseOthers && expanded) {
+      for (const [otherId, otherSection] of state.navigationSections.entries()) {
+        if (otherId === sectionId) continue;
+        otherSection.grid.hidden = true;
+        otherSection.toggle.setAttribute("aria-expanded", "false");
+        otherSection.container.classList.remove("expanded");
+      }
+    }
+
+    const navigationSection = state.navigationSections.get(sectionId);
+    if (!navigationSection) return;
+
+    navigationSection.grid.hidden = !expanded;
+    navigationSection.toggle.setAttribute("aria-expanded", String(expanded));
+    navigationSection.container.classList.toggle("expanded", expanded);
+  }
+
+  function createNavigationSection(section, totalQuestions) {
+    const container = document.createElement("section");
+    container.className = "navigation-section";
+    container.dataset.navigationSection = section.id;
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "navigation-section-toggle";
+    toggle.setAttribute("aria-expanded", "false");
+
+    const title = document.createElement("span");
+    title.className = "navigation-section-title";
+    title.textContent = section.title;
+
+    const progress = document.createElement("span");
+    progress.className = "navigation-section-progress";
+    progress.textContent = `0/${totalQuestions} checked`;
+
+    const chevron = document.createElement("span");
+    chevron.className = "navigation-section-chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "▸";
+
+    toggle.append(title, progress, chevron);
+
+    const grid = document.createElement("div");
+    grid.className = "navigation-section-question-grid";
+    grid.hidden = true;
+
+    toggle.addEventListener("click", () => {
+      const willExpand = toggle.getAttribute("aria-expanded") !== "true";
+      setNavigationSectionExpanded(section.id, willExpand, willExpand);
+    });
+
+    container.append(toggle, grid);
+    navigationGrid.append(container);
+
+    const navigationSection = { container, toggle, title, progress, grid };
+    state.navigationSections.set(section.id, navigationSection);
+
+    if (state.navigationSections.size === 1) {
+      setNavigationSectionExpanded(section.id, true, false);
+    }
+
+    return navigationSection;
+  }
+
   function setCurrentNavigationQuestion(questionNumber) {
     if (state.currentQuestionNumber === questionNumber) return;
     state.currentQuestionNumber = questionNumber;
+
+    const currentRecord = state.questions.find((record) => record.number === questionNumber);
+    if (currentRecord) {
+      setNavigationSectionExpanded(currentRecord.sectionId, true, true);
+    }
+
     state.questions.forEach((record) => {
       record.navButton?.classList.toggle("current", record.number === questionNumber);
     });
@@ -509,15 +911,18 @@
     window.setTimeout(() => record.row.classList.remove("navigation-highlight"), 1200);
   }
 
-  function createNavigationButton(record) {
+  function createNavigationButton(record, navigationSection) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "navigation-question-button";
-    button.textContent = String(record.number);
-    button.title = `${record.sectionTitle} — Question ${record.number}`;
-    button.setAttribute("aria-label", `Go to question ${record.number}`);
+    button.textContent = String(record.sectionQuestionNumber);
+    button.title = `${record.sectionTitle} — Question ${record.sectionQuestionNumber}`;
+    button.setAttribute(
+      "aria-label",
+      `Go to ${record.sectionTitle}, question ${record.sectionQuestionNumber}`
+    );
     button.addEventListener("click", () => scrollToQuestion(record));
-    navigationGrid.append(button);
+    navigationSection.grid.append(button);
     record.navButton = button;
   }
 
@@ -530,43 +935,26 @@
     statusIcon.classList.add(correct ? "correct" : "incorrect");
   }
 
-  function gradeQuestion({ section, question, renderType, row, answerArea, checkButton, sectionState, record }) {
-    let correct = false;
-    let hasAnswer = true;
-    let selectedAnswer = "";
 
-    if (["text", "leadership-text", "hand-signal", "fill-blank"].includes(renderType)) {
-      const input = answerArea.querySelector("[data-role='text-answer']");
-      selectedAnswer = input.value;
-      hasAnswer = Boolean(normalize(selectedAnswer));
+  function gradeQuestion(
+    { section, question, renderType, row, answerArea, checkButton, sectionState, record },
+    { allowBlank = false } = {}
+  ) {
+    if (row.dataset.graded === "true") return true;
 
-      if (renderType === "leadership-text") {
-        correct = isLeadershipTypedCorrect(question, selectedAnswer);
-      } else if (renderType === "hand-signal") {
-        correct = isHandSignalCorrect(question, selectedAnswer);
-      } else {
-        correct = isTextCorrect(question, selectedAnswer);
-      }
-    } else if (renderType === "leadership-dropdown") {
-      const select = answerArea.querySelector("[data-role='leadership-select']");
-      selectedAnswer = select.value;
-      hasAnswer = Boolean(normalize(selectedAnswer));
-      correct = hasAnswer && normalize(selectedAnswer) === normalize(question.name);
-    } else {
-      const selected = answerArea.querySelector("input[type='radio']:checked");
-      hasAnswer = Boolean(selected);
-      selectedAnswer = selected?.value || "";
-      correct = hasAnswer && normalize(selectedAnswer) === normalize(question.answer);
-    }
+    const { selectedAnswer, hasAnswer, correct } = readQuestionResponse({
+      question,
+      renderType,
+      answerArea
+    });
 
     const feedback = row.querySelector(".answer-feedback");
-    if (!hasAnswer) {
+    if (!hasAnswer && !allowBlank) {
       feedback.hidden = false;
       feedback.innerHTML = "Select or enter an answer before pressing <strong>Check</strong>.";
-      return;
+      return false;
     }
 
-    if (row.dataset.graded === "true") return;
     row.dataset.graded = "true";
 
     const pendingState = row.querySelector(".question-state-pending");
@@ -580,16 +968,18 @@
     gradeLabel.classList.add(correct ? "correct" : "incorrect");
     gradeScore.textContent = correct ? "1.00" : "0.00";
 
-    if (["text", "leadership-text", "hand-signal", "fill-blank"].includes(renderType)) {
+    if (["text", "leadership-text", "hand-signal", "terrain-picture", "rank-picture", "fill-blank"].includes(renderType)) {
       markTextControl(answerArea, correct, "[data-role='text-answer']");
     } else if (renderType === "leadership-dropdown") {
       markTextControl(answerArea, correct, "[data-role='leadership-select']");
+    } else if (renderType === "terrain-dropdown") {
+      markTextControl(answerArea, correct, "[data-role='terrain-select']");
     } else {
       const choices = answerArea.querySelectorAll("input[type='radio']");
       choices.forEach((choiceInput) => {
         choiceInput.disabled = true;
         const label = choiceInput.closest(".choice-row");
-        if (normalize(choiceInput.value) === normalize(question.answer)) {
+        if (canonicalAnswer(choiceInput.value) === canonicalAnswer(question.answer)) {
           label.classList.add("correct-choice");
         } else if (choiceInput.checked) {
           label.classList.add("incorrect-choice");
@@ -599,7 +989,9 @@
 
     checkButton.disabled = true;
     feedback.hidden = false;
-    feedback.innerHTML = `The correct answer is: <strong>${escapeHtml(correctAnswerText(question, section.type))}</strong>`;
+    feedback.innerHTML = !hasAnswer
+      ? `No answer was submitted. The correct answer is: <strong>${escapeHtml(correctAnswerText(question, section.type))}</strong>`
+      : `The correct answer is: <strong>${escapeHtml(correctAnswerText(question, section.type))}</strong>`;
 
     sectionState.graded += 1;
     state.gradedCount += 1;
@@ -607,14 +999,23 @@
 
     record.graded = true;
     record.correct = correct;
-    record.userAnswer = selectedAnswer;
+    record.userAnswer = hasAnswer ? selectedAnswer : "";
     record.navButton.classList.add(correct ? "correct" : "incorrect");
 
     updateScores();
     revealFinalSummaryIfComplete();
+    return true;
   }
 
-  function renderQuestion(section, question, globalQuestionNumber, sectionState, renderType) {
+  function renderQuestion(
+    section,
+    question,
+    globalQuestionNumber,
+    sectionQuestionNumber,
+    sectionState,
+    renderType,
+    navigationSection
+  ) {
     const fragment = questionTemplate.content.cloneNode(true);
     const row = fragment.querySelector(".question-row");
     const sidebar = fragment.querySelector(".question-sidebar");
@@ -625,18 +1026,21 @@
     const checkButton = fragment.querySelector(".check-button");
     const flagButton = fragment.querySelector(".flag-button");
 
+    const sectionNumber = sectionNumberFor(section);
+
     row.id = `question-${globalQuestionNumber}`;
     row.dataset.questionNumber = String(globalQuestionNumber);
-    questionNumber.textContent = `Question ${globalQuestionNumber}`;
+    questionNumber.innerHTML = `<span>Section ${sectionNumber}</span><span>Question ${sectionQuestionNumber}</span>`;
 
-    const imagePath = section.type === "leadership" || section.type === "hand-signal"
-      ? question.image
-      : "";
+    const imagePath = question.image || "";
     const displayedPrompt = promptText(question, section.type, renderType);
 
     const formatLabels = {
       "leadership-dropdown": "Picture and name dropdown",
       "leadership-text": "Picture and typed name, rank, and position",
+      "terrain-dropdown": "Terrain picture and dropdown",
+      "terrain-picture": "Terrain picture identification",
+      "rank-picture": "Army rank picture identification",
       "multiple-choice": "Multiple choice",
       "fill-blank": "Fill in the blank",
       "true-false": "True or False",
@@ -646,6 +1050,7 @@
 
     const record = {
       number: globalQuestionNumber,
+      sectionQuestionNumber,
       sectionId: section.id,
       sectionTitle: section.title,
       sectionType: section.type,
@@ -658,10 +1063,17 @@
       correct: false,
       flagged: false,
       row,
-      navButton: null
+      navButton: null,
+      question,
+      renderType,
+      answerArea,
+      checkButton,
+      sectionState,
+      section
     };
+
     state.questions.push(record);
-    createNavigationButton(record);
+    createNavigationButton(record, navigationSection);
 
     prompt.innerHTML = `<p>${escapeHtml(displayedPrompt)}</p>`;
 
@@ -676,6 +1088,14 @@
           ? createLeadershipDropdown(`question-${globalQuestionNumber}`)
           : createTextInput()
       );
+    } else if (section.type === "rank") {
+      media.append(createImage(
+        question.image,
+        `Army rank insignia for ${question.name}`,
+        "images/placeholder-rank.svg",
+        "question-image rank-question-image"
+      ));
+      answerArea.append(createTextInput());
     } else if (section.type === "hand-signal") {
       media.append(createImage(
         question.image,
@@ -683,6 +1103,17 @@
         "images/placeholder-hand-signal.svg"
       ));
       answerArea.append(createTextInput());
+    } else if (section.type === "terrain" && question.image) {
+      media.append(createImage(
+        question.image,
+        `Terrain-feature identification image for ${question.answer}`,
+        "images/placeholder-hand-signal.svg"
+      ));
+      answerArea.append(
+        renderType === "terrain-dropdown"
+          ? createTerrainDropdown(`question-${globalQuestionNumber}`)
+          : createTextInput()
+      );
     } else if (renderType === "multiple-choice") {
       answerArea.append(createChoiceList(question, `question-${globalQuestionNumber}`));
     } else if (renderType === "true-false") {
@@ -690,6 +1121,17 @@
     } else {
       answerArea.append(createTextInput());
     }
+
+    record.grade = (options = {}) => gradeQuestion({
+      section,
+      question,
+      renderType,
+      row,
+      answerArea,
+      checkButton,
+      sectionState,
+      record
+    }, options);
 
     flagButton.addEventListener("click", () => {
       const isFlagged = flagButton.getAttribute("aria-pressed") === "true";
@@ -701,8 +1143,11 @@
     });
 
     checkButton.addEventListener("click", () => {
-      gradeQuestion({ section, question, renderType, row, answerArea, checkButton, sectionState, record });
+      record.grade();
     });
+
+    answerArea.addEventListener("input", updateScores);
+    answerArea.addEventListener("change", updateScores);
 
     const textInput = answerArea.querySelector("[data-role='text-answer']");
     if (textInput) {
@@ -730,6 +1175,10 @@
     if (section.type === "leadership") {
       return state.mode === PHASE_6 ? "leadership-dropdown" : "leadership-text";
     }
+    if (section.type === "terrain" && question.image) {
+      return state.mode === PHASE_6 ? "terrain-dropdown" : "terrain-picture";
+    }
+    if (section.type === "rank") return "rank-picture";
     if (section.type === "hand-signal") return "hand-signal";
     if (section.type === "true-false") return "true-false";
     if (section.type === "multiple-choice") {
@@ -752,6 +1201,8 @@
     };
     state.sections.set(section.id, sectionState);
 
+    const navigationSection = createNavigationSection(section, section.data.length);
+
     const heading = document.createElement("div");
     heading.className = "section-heading";
     heading.innerHTML = `
@@ -770,6 +1221,13 @@
       wrapper.append(warning);
     }
 
+    if (section.id === "ranks" && section.data.length !== PASS_REQUIREMENTS.ranks) {
+      const warning = document.createElement("div");
+      warning.className = "empty-data-warning";
+      warning.innerHTML = `<strong>${section.data.length} of 29 Army ranks are currently loaded.</strong> Check <code>data/ranks.js</code> and add the insignia images in <code>images/ranks/</code>.`;
+      wrapper.append(warning);
+    }
+
     if (section.data.length === 0) {
       const warning = document.createElement("div");
       warning.className = "empty-data-warning";
@@ -779,16 +1237,26 @@
     }
 
     const randomizedQuestions = shuffle(section.data);
-    let questionNumberValue = startingQuestionNumber;
+    let globalQuestionNumber = startingQuestionNumber;
+    let sectionQuestionNumber = 1;
 
     randomizedQuestions.forEach((question) => {
       const renderType = renderTypeForQuestion(section, question, fillBlankSelection);
-      wrapper.append(renderQuestion(section, question, questionNumberValue, sectionState, renderType));
-      questionNumberValue += 1;
+      wrapper.append(renderQuestion(
+        section,
+        question,
+        globalQuestionNumber,
+        sectionQuestionNumber,
+        sectionState,
+        renderType,
+        navigationSection
+      ));
+      globalQuestionNumber += 1;
+      sectionQuestionNumber += 1;
       state.questionCount += 1;
     });
 
-    return { element: wrapper, nextQuestionNumber: questionNumberValue };
+    return { element: wrapper, nextQuestionNumber: globalQuestionNumber };
   }
 
   function initializeQuestionObserver() {
@@ -817,12 +1285,12 @@
     state.questions = [];
     state.submitted = false;
     state.currentQuestionNumber = null;
+    state.navigationSections.clear();
     state.observer?.disconnect();
     state.observer = null;
     testContainer.innerHTML = "";
     navigationGrid.innerHTML = "";
     summaryContent.innerHTML = "";
-    requirementsGrid.innerHTML = "";
     finalSummary.hidden = true;
     quizNavigation.hidden = false;
     showNavigationButton.hidden = true;
@@ -831,9 +1299,8 @@
   function initializeTest() {
     resetTestState();
     currentModeBadge.textContent = modeLabel(state.mode);
-    renderScoreOverview();
     let nextQuestionNumber = 1;
-    sectionDefinitions.forEach((section) => {
+    activeSectionDefinitions().forEach((section) => {
       const rendered = renderSection(section, nextQuestionNumber);
       testContainer.append(rendered.element);
       nextQuestionNumber = rendered.nextQuestionNumber;
@@ -866,7 +1333,7 @@
   }
 
   function buildAttemptRecord() {
-    const sectionResults = sectionDefinitions.map((section) => {
+    const sectionResults = activeSectionDefinitions().map((section) => {
       const result = state.sections.get(section.id);
       const requirement = PASS_REQUIREMENTS[section.id] || null;
       return {
@@ -898,6 +1365,7 @@
       sectionResults,
       questions: state.questions.map((record) => ({
         number: record.number,
+        sectionQuestionNumber: record.sectionQuestionNumber,
         sectionId: record.sectionId,
         sectionTitle: record.sectionTitle,
         sectionType: record.sectionType,
@@ -979,9 +1447,9 @@
   }
 
   function reviewImageFallback(sectionType) {
-    return sectionType === "leadership"
-      ? "images/placeholder-person.svg"
-      : "images/placeholder-hand-signal.svg";
+    if (sectionType === "leadership") return "images/placeholder-person.svg";
+    if (sectionType === "rank") return "images/placeholder-rank.svg";
+    return "images/placeholder-hand-signal.svg";
   }
 
   function renderAttemptReview(attemptId) {
@@ -999,7 +1467,7 @@
       </tr>
     `).join("");
 
-    const groupedQuestions = sectionDefinitions.map((section) => {
+    const groupedQuestions = activeSectionDefinitions(attempt.mode).map((section) => {
       const questions = attempt.questions.filter((question) => question.sectionId === section.id);
       if (questions.length === 0) return "";
 
@@ -1010,7 +1478,7 @@
         return `
           <article class="review-question-card ${question.correct ? "correct" : "incorrect"}">
             <div class="review-question-heading">
-              <strong>Question ${question.number}</strong>
+              <strong>Question ${question.sectionQuestionNumber || question.number}</strong>
               <strong class="${question.correct ? "pass-label" : "fail-label"}">${question.correct ? "Correct" : "Incorrect"}</strong>
             </div>
             <p class="question-format-label">${escapeHtml(question.questionFormat || "Question")}</p>
@@ -1019,7 +1487,7 @@
             <div class="review-answer-grid">
               <div class="review-answer-box">
                 <span>Your answer</span>
-                <strong>${escapeHtml(question.userAnswer || "No answer")}</strong>
+                <strong>${escapeHtml(question.userAnswer || "No answer submitted")}</strong>
               </div>
               <div class="review-answer-box">
                 <span>Correct answer</span>
@@ -1070,16 +1538,45 @@
   }
 
   submitTestButton.addEventListener("click", () => {
-    if (state.gradedCount !== state.questionCount || state.questionCount === 0) {
-      const remaining = state.questionCount - state.gradedCount;
-      window.alert(`Check the remaining ${remaining} question${remaining === 1 ? "" : "s"} before submitting.`);
+    if (state.questionCount === 0) {
+      window.alert("No questions are loaded.");
       return;
+    }
+
+    const ungradedRecords = state.questions.filter((record) => !record.graded);
+    const answeredNotChecked = ungradedRecords.filter((record) => responseForRecord(record).hasAnswer);
+    const unanswered = ungradedRecords.filter((record) => !responseForRecord(record).hasAnswer);
+
+    if (ungradedRecords.length > 0) {
+      const messageParts = ["Are you sure you want to submit this test?"];
+
+      if (answeredNotChecked.length > 0) {
+        messageParts.push(
+          `${answeredNotChecked.length} answered question${answeredNotChecked.length === 1 ? " has" : "s have"} not been checked. ${answeredNotChecked.length === 1 ? "It" : "They"} will be graded automatically.`
+        );
+      }
+
+      if (unanswered.length > 0) {
+        messageParts.push(
+          `${unanswered.length} question${unanswered.length === 1 ? " has" : "s have"} not been answered. ${unanswered.length === 1 ? "It" : "They"} will be marked incorrect.`
+        );
+      }
+
+      messageParts.push("Select OK to submit, or Cancel to return to the test.");
+
+      const confirmed = window.confirm(messageParts.join("\n\n"));
+      if (!confirmed) return;
+
+      ungradedRecords.forEach((record) => {
+        record.grade({ allowBlank: true });
+      });
     }
 
     if (!state.submitted) {
       saveAttempt(buildAttemptRecord());
       state.submitted = true;
     }
+
     showAttemptsMenu();
   });
 

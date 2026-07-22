@@ -1,0 +1,44 @@
+ARMY RANK IMAGE FILES
+=====================
+
+Create this folder inside the website:
+
+images/ranks/
+
+Add one PNG for every filename below:
+
+pv1.png
+pv2.png
+pfc.png
+spc.png
+cpl.png
+sgt.png
+ssg.png
+sfc.png
+msg.png
+1sg.png
+sgm.png
+csm.png
+sma.png
+wo1.png
+cw2.png
+cw3.png
+cw4.png
+cw5.png
+2lt.png
+1lt.png
+cpt.png
+maj.png
+ltc.png
+col.png
+bg.png
+mg.png
+ltg.png
+gen.png
+goa.png
+
+Important:
+- Use these exact lowercase filenames.
+- GitHub Pages file paths are case-sensitive.
+- The quiz will still load with a placeholder if an image is missing, but the
+  rank picture question will not be useful until the correct image is added.

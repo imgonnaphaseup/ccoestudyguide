@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="360" viewBox="0 0 520 360" role="img" aria-labelledby="title desc">
+  <title id="title">Army rank image missing</title>
+  <desc id="desc">Placeholder displayed when a rank insignia image cannot be loaded.</desc>
+  <rect width="520" height="360" fill="#ffffff"/>
+  <rect x="12" y="12" width="496" height="336" rx="16" fill="#f3f6f8" stroke="#647685" stroke-width="4" stroke-dasharray="12 10"/>
+  <path d="M260 80l54 34v64c0 54-31 91-54 104-23-13-54-50-54-104v-64z" fill="#d7dee4" stroke="#647685" stroke-width="5"/>
+  <text x="260" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#273746">RANK IMAGE NOT FOUND</text>
+</svg>

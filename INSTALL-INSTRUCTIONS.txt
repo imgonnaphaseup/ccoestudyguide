@@ -1,0 +1,86 @@
+CYBER STUDY TEST — RANKS, DRILLS, GENERAL KNOWLEDGE, SHARP/EO UPDATE
+====================================================================
+
+WHAT TO REPLACE
+---------------
+Copy these files into the main website folder and allow Windows to replace
+the existing versions:
+
+- index.html
+- app.js
+- styles.css
+
+Replace the entire contents of the existing data folder with the supplied
+data folder:
+
+- data/leadership.js
+- data/mottos.js
+- data/army-values.js
+- data/map-colors.js
+- data/terrain-features.js
+- data/movement-drills.js
+- data/true-false.js
+- data/general-knowledge.js
+- data/hand-signals.js
+- data/ranks.js
+- data/unit-sharp-eo.js
+
+WHAT TO ADD
+-----------
+1. Copy this new file into the existing images folder:
+
+   images/placeholder-rank.svg
+
+2. Create this new folder:
+
+   images/ranks/
+
+3. Add the 29 Army-rank PNG files listed in RANK-IMAGE-FILENAMES.txt.
+
+DO NOT DELETE
+-------------
+Keep all of your current folders and pictures:
+
+- images/leadership/
+- images/hand-signals/
+- images/terrain-features/
+- images/favico/
+- images/misc/
+
+FINAL SECTION BEHAVIOR
+----------------------
+Phase 6:
+- Sections 1 through 11
+- 228 total questions
+- Leadership picture dropdown includes fake name/rank distractors
+- Army rank pictures are typed fill-in-the-blank questions
+- Rank answers accept abbreviations or full names
+- Army Rank Picture Identification requires 29/29
+- SHARP and EO appears only in Phase 6
+- Unit-personnel questions are in General Knowledge
+
+Phase 6+:
+- Sections 1 through 9
+- 187 total questions
+- No Army Rank Picture Identification section
+- No SHARP/EO section
+- Unit-personnel questions remain in General Knowledge
+- Up to 25% of multiple-choice sections become fill-in-the-blank
+- Leadership accepts the correct last name with the correct rank/title and position
+
+SAVED ATTEMPTS
+--------------
+The local-storage key remains:
+
+cyberStudyTestAttemptsV2
+
+Replacing these files or updating GitHub Pages will not intentionally erase
+attempts already saved at the same website address and in the same browser.
+
+AFTER INSTALLING
+----------------
+1. Reopen index.html.
+2. Press Ctrl+F5.
+3. Test Phase 6 and confirm the rank images appear.
+4. Test Phase 6+ and confirm Sections 10 and 11 are not present.
+5. Upload the changed files and new images/ranks folder to GitHub.

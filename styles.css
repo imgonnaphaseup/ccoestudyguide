@@ -1158,3 +1158,17 @@ body:has(#menuView:not([hidden])) .subtitle {
 }
 
 [hidden] { display: none !important; }
+
+
+.rank-question-image {
+  width: min(100%, 280px);
+  max-height: 280px;
+  padding: 14px;
+}
+
+@media (max-width: 720px) {
+  .rank-question-image {
+    width: min(100%, 230px);
+    max-height: 230px;
+  }
+}

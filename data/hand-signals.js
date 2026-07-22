@@ -63,5 +63,12 @@ window.HAND_SIGNAL_DATA = [
     answer: "Head Count",
     description: "Conduct a head count",
     acceptedAnswers: ["count personnel", "conduct head count", "headcount"]
+  },
+  {
+    id: "coil",
+    image: "images/hand-signals/coil.png",
+    answer: "Coil",
+    description: "Coil formation",
+    acceptedAnswers: ["coil formation", "form a coil"]
   }
 ];

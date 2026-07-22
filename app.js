@@ -3,7 +3,8 @@
 
   const PASS_REQUIREMENTS = {
     leadership: 15,
-    mottos: 4
+    mottos: 4,
+    ranks: 29
   };
 
   const ATTEMPT_STORAGE_KEY = "cyberStudyTestAttemptsV2";
@@ -45,7 +46,7 @@
     },
     {
       id: "movement-drills",
-      title: "Section 6: Military Movement Drills",
+      title: "Section 6: Preparation Drill, Recovery Drill, MMD1, and MMD2 (ATP 7-22.02)",
       type: "multiple-choice",
       data: window.MOVEMENT_DRILL_DATA || []
     },
@@ -63,11 +64,33 @@
     },
     {
       id: "hand-signals",
-      title: "Section 9: Hand-Signal Picture Identification",
+      title: "Section 9: Hand-Signal Picture Identification (TC 3-21.60)",
       type: "hand-signal",
       data: window.HAND_SIGNAL_DATA || []
+    },
+    {
+      id: "ranks",
+      title: "Section 10: Army Rank Picture Identification",
+      type: "rank",
+      modes: [PHASE_6],
+      data: window.RANK_DATA || []
+    },
+    {
+      id: "sharp-eo",
+      title: "Section 11: SHARP and EO (AR 600-20)",
+      type: "multiple-choice",
+      modes: [PHASE_6],
+      data: window.SHARP_EO_DATA || []
     }
   ];
+
+  function sectionEnabledForMode(section, mode = state.mode) {
+    return !section.modes || section.modes.includes(mode);
+  }
+
+  function activeSectionDefinitions(mode = state.mode) {
+    return sectionDefinitions.filter((section) => sectionEnabledForMode(section, mode));
+  }
 
   const menuView = document.getElementById("menuView");
   const testView = document.getElementById("testView");
@@ -275,6 +298,19 @@
     return expectedTokens.length > 0 && expectedTokens.every((token) => userTokens.has(token));
   }
 
+  function orderedItemsIncluded(userValue, requiredItems) {
+    const normalizedUser = canonicalAnswer(userValue);
+    let searchFrom = 0;
+
+    return requiredItems.every((item) => {
+      const normalizedItem = canonicalAnswer(item);
+      const foundAt = normalizedUser.indexOf(normalizedItem, searchFrom);
+      if (foundAt === -1) return false;
+      searchFrom = foundAt + normalizedItem.length;
+      return true;
+    });
+  }
+
   function automaticAnswerVariants(value) {
     const raw = String(value ?? "").trim();
     const variants = new Set();
@@ -339,6 +375,10 @@
       return requiredItems.every((item) => phraseTokensIncluded(normalizedUserAnswer, item));
     }
 
+    if (question.answerType === "ordered-list") {
+      return orderedItemsIncluded(normalizedUserAnswer, question.requiredItems || []);
+    }
+
     const acceptedAnswers = acceptedTextAnswers(question);
     if (acceptedAnswers.includes(normalizedUserAnswer)) return true;
 
@@ -346,6 +386,21 @@
       const expectedTokens = significantTokens(answer);
       return expectedTokens.length >= 2 && phraseTokensIncluded(normalizedUserAnswer, answer);
     });
+  }
+
+  function isRankCorrect(question, userAnswer) {
+    const normalizedUserAnswer = canonicalAnswer(userAnswer);
+    if (!normalizedUserAnswer) return false;
+
+    const possibleAnswers = [
+      question.abbreviation,
+      ...(question.requireGrade ? [] : [question.name]),
+      ...(question.acceptedAnswers || [])
+    ];
+
+    return possibleAnswers
+      .filter(Boolean)
+      .some((answer) => canonicalAnswer(answer) === normalizedUserAnswer);
   }
 
   function rankAliasesFor(rank) {
@@ -365,7 +420,9 @@
       .split(" ")
       .filter((token) => token.length > 1);
     const userTokens = new Set(normalizedUserAnswer.split(" "));
-    const hasCorrectName = requiredNameTokens.every((token) => userTokens.has(token));
+    const lastNameToken = requiredNameTokens.at(-1);
+    const hasFullName = requiredNameTokens.every((token) => userTokens.has(token));
+    const hasCorrectName = hasFullName || Boolean(lastNameToken && userTokens.has(lastNameToken));
 
     const hasCorrectRank = rankAliasesFor(question.rank)
       .some((alias) => phraseTokensIncluded(normalizedUserAnswer, alias));
@@ -388,6 +445,9 @@
     if (sectionType === "leadership") {
       return `${question.rank} ${question.name} — ${question.position}`;
     }
+    if (sectionType === "rank") {
+      return `${question.name} (${question.abbreviation})`;
+    }
     if ((sectionType === "hand-signal" || sectionType === "terrain") && question.description) {
       return `${question.answer} — ${question.description}`;
     }
@@ -401,8 +461,8 @@
   function sectionDescription(section, fillBlankCount = 0) {
     if (section.id === "leadership") {
       return state.mode === PHASE_6
-        ? "Select each person's full first and last name from the dropdown. Required score: 15 out of 15."
-        : "Type each person's full first and last name, rank, and position. Required score: 15 out of 15.";
+        ? "Select the correct rank and full name from the word bank. Fake names and ranks are included. Required score: 15 out of 15."
+        : "Type the person's rank or title, last name or full name, and position. Required score: 15 out of 15.";
     }
     if (section.id === "mottos") {
       return "Type the correct motto. Required score: 4 out of 4.";
@@ -421,6 +481,17 @@
     if (section.id === "hand-signals") {
       return "Identify or describe the hand signal shown.";
     }
+    if (section.id === "ranks") {
+      return "Type the abbreviation or full name of every Army rank shown. Required score: 29 out of 29. This section appears only in Phase 6.";
+    }
+    if (section.id === "sharp-eo") {
+      return "Answer the SHARP and EO questions. This section appears only in Phase 6.";
+    }
+    if (section.id === "movement-drills") {
+      return state.mode === PHASE_6_PLUS
+        ? `${fillBlankCount} out of ${section.data.length} drill questions were randomly changed to fill in the blank.`
+        : "Multiple choice questions cover the Preparation Drill, Recovery Drill, MMD1, and MMD2.";
+    }
     if (section.type === "multiple-choice" && state.mode === PHASE_6_PLUS) {
       return `${fillBlankCount} out of ${section.data.length} questions were randomly changed to fill in the blank. All other questions are multiple choice.`;
     }
@@ -433,11 +504,14 @@
   function promptText(question, sectionType, renderType) {
     if (sectionType === "leadership") {
       return renderType === "leadership-dropdown"
-        ? "Identify the person shown by selecting the correct full first and last name."
-        : "Identify the person shown. Type the full first and last name, rank, and position within the Cyber Center of Excellence.";
+        ? "Identify the person shown by selecting the correct rank and full name."
+        : "Identify the person shown. Type the rank or title, last name or full name, and position.";
     }
     if (sectionType === "hand-signal") {
       return "Identify or describe the hand signal shown.";
+    }
+    if (sectionType === "rank") {
+      return "Identify the Army rank insignia shown. Type the rank abbreviation or full rank name.";
     }
     if (sectionType === "terrain" && question.image) {
       return renderType === "terrain-dropdown"
@@ -509,7 +583,18 @@
         label: `${person.rank} ${person.name}`
       }));
 
-    shuffle(people).forEach((person) => {
+    const distractors = [
+      { name: "__fake_1", label: "CSM Marcus Thompson" },
+      { name: "__fake_2", label: "LTC Andrew Reynolds" },
+      { name: "__fake_3", label: "CPT Jordan Ellis" },
+      { name: "__fake_4", label: "MG Robert Wallace" },
+      { name: "__fake_5", label: "SFC Daniel Carter" },
+      { name: "__fake_6", label: "COL James Whitaker" },
+      { name: "__fake_7", label: "1SG Kevin Brooks" },
+      { name: "__fake_8", label: "LTG Samuel Price" }
+    ];
+
+    shuffle([...people, ...distractors]).forEach((person) => {
       const option = document.createElement("option");
       option.value = person.name;
       option.textContent = person.label;
@@ -607,7 +692,7 @@
     let hasAnswer = true;
     let correct = false;
 
-    if (["text", "leadership-text", "hand-signal", "terrain-picture", "fill-blank"].includes(renderType)) {
+    if (["text", "leadership-text", "hand-signal", "terrain-picture", "rank-picture", "fill-blank"].includes(renderType)) {
       const input = answerArea.querySelector("[data-role='text-answer']");
       selectedAnswer = input?.value || "";
       hasAnswer = Boolean(canonicalAnswer(selectedAnswer));
@@ -616,6 +701,8 @@
         correct = isLeadershipTypedCorrect(question, selectedAnswer);
       } else if (renderType === "hand-signal") {
         correct = isHandSignalCorrect(question, selectedAnswer);
+      } else if (renderType === "rank-picture") {
+        correct = isRankCorrect(question, selectedAnswer);
       } else {
         correct = isTextCorrect(question, selectedAnswer);
       }
@@ -688,7 +775,8 @@
   function revealFinalSummaryIfComplete() {
     if (state.questionCount === 0 || state.gradedCount !== state.questionCount) return;
 
-    const rows = sectionDefinitions.map((section) => {
+    const visibleSections = activeSectionDefinitions();
+    const rows = visibleSections.map((section) => {
       const sectionState = state.sections.get(section.id);
       const requirement = PASS_REQUIREMENTS[section.id];
       let status = "Completed";
@@ -708,12 +796,13 @@
       `;
     }).join("");
 
-    const leadershipState = state.sections.get("leadership");
-    const mottoState = state.sections.get("mottos");
-    const requiredPassed = leadershipState?.score === 15
-      && leadershipState?.total >= 15
-      && mottoState?.score === 4
-      && mottoState?.total >= 4;
+    const requiredPassed = visibleSections
+      .filter((section) => PASS_REQUIREMENTS[section.id])
+      .every((section) => {
+        const sectionState = state.sections.get(section.id);
+        const requirement = PASS_REQUIREMENTS[section.id];
+        return sectionState?.score === requirement && sectionState?.total >= requirement;
+      });
 
     summaryContent.innerHTML = `
       <p><strong>Mode:</strong> ${escapeHtml(modeLabel(state.mode))}</p>
@@ -732,7 +821,7 @@
 
 
   function sectionNumberFor(section) {
-    return sectionDefinitions.findIndex((item) => item.id === section.id) + 1;
+    return activeSectionDefinitions().findIndex((item) => item.id === section.id) + 1;
   }
 
   function setNavigationSectionExpanded(sectionId, expanded, collapseOthers = false) {
@@ -879,7 +968,7 @@
     gradeLabel.classList.add(correct ? "correct" : "incorrect");
     gradeScore.textContent = correct ? "1.00" : "0.00";
 
-    if (["text", "leadership-text", "hand-signal", "terrain-picture", "fill-blank"].includes(renderType)) {
+    if (["text", "leadership-text", "hand-signal", "terrain-picture", "rank-picture", "fill-blank"].includes(renderType)) {
       markTextControl(answerArea, correct, "[data-role='text-answer']");
     } else if (renderType === "leadership-dropdown") {
       markTextControl(answerArea, correct, "[data-role='leadership-select']");
@@ -951,6 +1040,7 @@
       "leadership-text": "Picture and typed name, rank, and position",
       "terrain-dropdown": "Terrain picture and dropdown",
       "terrain-picture": "Terrain picture identification",
+      "rank-picture": "Army rank picture identification",
       "multiple-choice": "Multiple choice",
       "fill-blank": "Fill in the blank",
       "true-false": "True or False",
@@ -998,6 +1088,14 @@
           ? createLeadershipDropdown(`question-${globalQuestionNumber}`)
           : createTextInput()
       );
+    } else if (section.type === "rank") {
+      media.append(createImage(
+        question.image,
+        `Army rank insignia for ${question.name}`,
+        "images/placeholder-rank.svg",
+        "question-image rank-question-image"
+      ));
+      answerArea.append(createTextInput());
     } else if (section.type === "hand-signal") {
       media.append(createImage(
         question.image,
@@ -1080,6 +1178,7 @@
     if (section.type === "terrain" && question.image) {
       return state.mode === PHASE_6 ? "terrain-dropdown" : "terrain-picture";
     }
+    if (section.type === "rank") return "rank-picture";
     if (section.type === "hand-signal") return "hand-signal";
     if (section.type === "true-false") return "true-false";
     if (section.type === "multiple-choice") {
@@ -1119,6 +1218,13 @@
       const warning = document.createElement("div");
       warning.className = "empty-data-warning";
       warning.innerHTML = `<strong>${section.data.length} of 15 leadership entries are currently loaded.</strong> Add the remaining people in <code>data/leadership.js</code> and their images in <code>images/leadership/</code>.`;
+      wrapper.append(warning);
+    }
+
+    if (section.id === "ranks" && section.data.length !== PASS_REQUIREMENTS.ranks) {
+      const warning = document.createElement("div");
+      warning.className = "empty-data-warning";
+      warning.innerHTML = `<strong>${section.data.length} of 29 Army ranks are currently loaded.</strong> Check <code>data/ranks.js</code> and add the insignia images in <code>images/ranks/</code>.`;
       wrapper.append(warning);
     }
 
@@ -1194,7 +1300,7 @@
     resetTestState();
     currentModeBadge.textContent = modeLabel(state.mode);
     let nextQuestionNumber = 1;
-    sectionDefinitions.forEach((section) => {
+    activeSectionDefinitions().forEach((section) => {
       const rendered = renderSection(section, nextQuestionNumber);
       testContainer.append(rendered.element);
       nextQuestionNumber = rendered.nextQuestionNumber;
@@ -1227,7 +1333,7 @@
   }
 
   function buildAttemptRecord() {
-    const sectionResults = sectionDefinitions.map((section) => {
+    const sectionResults = activeSectionDefinitions().map((section) => {
       const result = state.sections.get(section.id);
       const requirement = PASS_REQUIREMENTS[section.id] || null;
       return {
@@ -1341,9 +1447,9 @@
   }
 
   function reviewImageFallback(sectionType) {
-    return sectionType === "leadership"
-      ? "images/placeholder-person.svg"
-      : "images/placeholder-hand-signal.svg";
+    if (sectionType === "leadership") return "images/placeholder-person.svg";
+    if (sectionType === "rank") return "images/placeholder-rank.svg";
+    return "images/placeholder-hand-signal.svg";
   }
 
   function renderAttemptReview(attemptId) {
@@ -1361,7 +1467,7 @@
       </tr>
     `).join("");
 
-    const groupedQuestions = sectionDefinitions.map((section) => {
+    const groupedQuestions = activeSectionDefinitions(attempt.mode).map((section) => {
       const questions = attempt.questions.filter((question) => question.sectionId === section.id);
       if (questions.length === 0) return "";
 
