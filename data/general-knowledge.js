@@ -172,12 +172,12 @@ window.GENERAL_KNOWLEDGE_DATA = [
   {
     "id": "gk-ambush-types",
     "prompt": "What are the two types of ambush?",
-    "answer": "Point and area",
+    "answer": "Point and Area",
     "choices": [
-      "Point and area",
-      "Near and far",
-      "Hasty and deliberate",
-      "Linear and L-shaped"
+      "Point and Area",
+      "Attack and Defend",
+      "Day and Night",
+      "Mounted and Dismounted"
     ],
     "answerType": "unordered-list",
     "requiredItems": [
@@ -185,6 +185,7 @@ window.GENERAL_KNOWLEDGE_DATA = [
       "Area"
     ],
     "acceptedAnswers": [
+      "Point and area",
       "Point ambush and area ambush",
       "Point ambushes and area ambushes"
     ]
