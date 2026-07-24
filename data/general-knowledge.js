@@ -170,35 +170,23 @@ window.GENERAL_KNOWLEDGE_DATA = [
     ]
   },
   {
-    "id": "gk-ambush-distance",
-    "prompt": "What are the two ambush distance classifications?",
-    "answer": "Near and far",
+    "id": "gk-ambush-types",
+    "prompt": "What are the two types of ambush?",
+    "answer": "Point and area",
     "choices": [
+      "Point and area",
       "Near and far",
       "Hasty and deliberate",
-      "Linear and L-shaped",
-      "Mounted and dismounted"
+      "Linear and L-shaped"
     ],
     "answerType": "unordered-list",
     "requiredItems": [
-      "Near",
-      "Far"
-    ]
-  },
-  {
-    "id": "gk-ambush-planning",
-    "prompt": "What are the two ambush planning classifications?",
-    "answer": "Hasty and deliberate",
-    "choices": [
-      "Hasty and deliberate",
-      "Near and far",
-      "Linear and L-shaped",
-      "Offensive and defensive"
+      "Point",
+      "Area"
     ],
-    "answerType": "unordered-list",
-    "requiredItems": [
-      "Hasty",
-      "Deliberate"
+    "acceptedAnswers": [
+      "Point ambush and area ambush",
+      "Point ambushes and area ambushes"
     ]
   },
   {

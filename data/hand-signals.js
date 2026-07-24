@@ -65,10 +65,10 @@ window.HAND_SIGNAL_DATA = [
     acceptedAnswers: ["count personnel", "conduct head count", "headcount"]
   },
   {
-    id: "coil",
+    id: "rally",
     image: "images/hand-signals/coil.png",
-    answer: "Coil",
-    description: "Coil formation",
-    acceptedAnswers: ["coil formation", "form a coil"]
+    answer: "Rally",
+    description: "Rally at the indicated location",
+    acceptedAnswers: ["rally point", "rally here", "assemble", "assemble here"]
   }
 ];
