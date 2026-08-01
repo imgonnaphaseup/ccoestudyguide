@@ -14,13 +14,7 @@ window.RANK_DATA = [
     "requireGrade": true,
     "acceptedAnswers": [
       "PV1",
-      "PVT",
-      "Private PV1",
-      "Private PVT",
-      "Private E-1",
-      "Private E1",
-      "Private 1"
-    ]
+         ]
   },
   {
     "id": "rank-pv2",

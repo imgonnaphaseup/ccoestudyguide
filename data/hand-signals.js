@@ -67,8 +67,8 @@ window.HAND_SIGNAL_DATA = [
   {
     id: "rally",
     image: "images/hand-signals/coil.png",
-    answer: "Rally",
+    answer: "Rally Point",
     description: "Rally at the indicated location",
-    acceptedAnswers: ["rally point", "rally here", "assemble", "assemble here"]
+    acceptedAnswers: ["rally", "rally point", "rally here", "assemble", "assemble here"]
   }
 ];

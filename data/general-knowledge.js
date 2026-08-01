@@ -2,7 +2,7 @@
   GENERAL KNOWLEDGE DATA
   Unit personnel questions are included here so they appear in both Phase 6 and Phase 6+.
   Phase 6 uses multiple choice. Phase 6+ randomly changes up to 25% of these questions to fill in the blank.
-  The answer set follows the user-approved study material for this project.
+  Updated 1 AUG 2026 to match the latest instructor-provided study sheet.
 */
 
 window.GENERAL_KNOWLEDGE_DATA = [
@@ -81,7 +81,7 @@ window.GENERAL_KNOWLEDGE_DATA = [
   },
   {
     "id": "gk-phase-down-form",
-    "prompt": "What is the phase-down counseling form?",
+    "prompt": "What form is used for developmental counseling?",
     "answer": "DA Form 4856",
     "choices": [
       "DA Form 4856",
@@ -92,6 +92,37 @@ window.GENERAL_KNOWLEDGE_DATA = [
     "acceptedAnswers": [
       "DA 4856",
       "4856"
+    ],
+    "fillBlankPrompt": "Type the form used for developmental counseling."
+  },
+  {
+    "id": "gk-fraternization",
+    "prompt": "Which of the following actions are considered fraternization?",
+    "answer": "An officer dating an NCO",
+    "choices": [
+      "An officer dating an NCO",
+      "An NCO counseling a junior Soldier",
+      "Two Soldiers attending an official unit event",
+      "An officer conducting organized physical training"
+    ],
+    "acceptedAnswers": [
+      "Officer dating an NCO",
+      "An officer dating a noncommissioned officer"
+    ]
+  },
+  {
+    "id": "gk-open-ranks-first-rank",
+    "prompt": "On the command “Open Ranks, MARCH,” how many steps forward does the first rank take?",
+    "answer": "2 steps",
+    "choices": [
+      "2 steps",
+      "1 step",
+      "3 steps",
+      "4 steps"
+    ],
+    "acceptedAnswers": [
+      "2",
+      "Two steps"
     ]
   },
   {
@@ -113,9 +144,9 @@ window.GENERAL_KNOWLEDGE_DATA = [
   {
     "id": "gk-salute",
     "prompt": "What does SALUTE stand for?",
-    "answer": "Size, Activity, Location, Unit/Uniform, Time, Equipment",
+    "answer": "Size, Activity, Location, Unit, Time, Equipment",
     "choices": [
-      "Size, Activity, Location, Unit/Uniform, Time, Equipment",
+      "Size, Activity, Location, Unit, Time, Equipment",
       "Situation, Action, Location, Uniform, Terrain, Enemy",
       "Size, Area, Line, Unit, Time, Equipment",
       "Soldier, Activity, Location, Unit, Terrain, Engagement"
@@ -125,48 +156,50 @@ window.GENERAL_KNOWLEDGE_DATA = [
       "Size",
       "Activity",
       "Location",
-      "Unit/Uniform",
+      "Unit",
       "Time",
       "Equipment"
     ],
     "acceptedAnswers": [
+      "Size Activity Location Unit Time Equipment",
       "Size Activity Location Unit Uniform Time Equipment"
     ]
   },
   {
     "id": "gk-three-ds",
-    "prompt": "What are the three D's?",
-    "answer": "Direction, Distance, Description",
+    "prompt": "What are the three D's when reacting to contact?",
+    "answer": "Distance, Direction, Description",
     "choices": [
-      "Direction, Distance, Description",
+      "Distance, Direction, Description",
       "Distance, Duration, Danger",
       "Direction, Defense, Decision",
       "Description, Detection, Departure"
     ],
     "answerType": "unordered-list",
     "requiredItems": [
-      "Direction",
       "Distance",
+      "Direction",
       "Description"
     ]
   },
   {
     "id": "gk-airway",
-    "prompt": "What are the two ways to clear an airway?",
-    "answer": "Head-tilt chin-lift and jaw-thrust",
+    "prompt": "What are the two ways to open an airway?",
+    "answer": "Head-tilt/chin-lift and jaw-thrust",
     "choices": [
-      "Head-tilt chin-lift and jaw-thrust",
+      "Head-tilt/chin-lift and jaw-thrust",
       "Recovery position and chest compressions",
       "Finger sweep and abdominal thrusts",
       "Rescue breathing and pulse check"
     ],
     "answerType": "unordered-list",
     "requiredItems": [
-      "Head-tilt chin-lift",
+      "Head-tilt/chin-lift",
       "Jaw-thrust"
     ],
     "acceptedAnswers": [
-      "Head tilt chin lift jaw thrust"
+      "Head tilt chin lift jaw thrust",
+      "Head-tilt chin-lift and jaw-thrust"
     ]
   },
   {
@@ -188,6 +221,21 @@ window.GENERAL_KNOWLEDGE_DATA = [
       "Point and area",
       "Point ambush and area ambush",
       "Point ambushes and area ambushes"
+    ]
+  },
+  {
+    "id": "gk-depression-definition",
+    "prompt": "What is a sinkhole or other low point on the terrain called?",
+    "fillBlankPrompt": "A ______ is a sinkhole or other low point on the terrain.",
+    "answer": "Depression",
+    "choices": [
+      "Depression",
+      "Draw",
+      "Saddle",
+      "Cut"
+    ],
+    "acceptedAnswers": [
+      "A depression"
     ]
   },
   {
@@ -222,21 +270,21 @@ window.GENERAL_KNOWLEDGE_DATA = [
   },
   {
     "id": "gk-shock-sign",
-    "prompt": "What is a sign that someone may be going into shock?",
-    "answer": "Dizziness or confusion",
+    "prompt": "Which of the following is a form or sign of shock?",
+    "answer": "Restlessness or confusion",
     "choices": [
-      "Dizziness or confusion",
+      "Restlessness or confusion",
       "Increased appetite",
       "Improved coordination",
-      "Warm dry skin only"
+      "Warm, dry skin only"
     ],
     "acceptedAnswers": [
-      "Dizziness",
-      "Dizzyness",
-      "Dizzy",
+      "Restlessness",
+      "Restless",
       "Confusion",
       "Confused",
-      "Dizziness and confusion"
+      "Restlessness and confusion",
+      "Restlessness or confusion"
     ]
   },
   {
@@ -698,18 +746,22 @@ window.GENERAL_KNOWLEDGE_DATA = [
   },
   {
     "id": "gk-first-receive-weapon",
-    "prompt": "What should you do first when handed a weapon?",
-    "answer": "Clear the weapon using a 3-point safety check",
+    "prompt": "What should you do when you first receive a weapon?",
+    "answer": "Clear or check the weapon",
     "choices": [
-      "Clear the weapon using a 3-point safety check",
+      "Clear or check the weapon",
       "Insert a magazine",
       "Place the weapon on fire",
-      "Perform a functions check without clearing"
+      "Perform a functions check without clearing it"
     ],
     "acceptedAnswers": [
       "Clear the weapon",
+      "Check the weapon",
+      "Clear weapon",
+      "Check weapon",
+      "Clear the weapon using a 3-point safety check",
       "3-point safety check",
-      "Three point safety check"
+      "Three-point safety check"
     ]
   },
   {
@@ -746,6 +798,22 @@ window.GENERAL_KNOWLEDGE_DATA = [
     ],
     "acceptedAnswers": [
       "Compass to cheek center hold"
+    ]
+  },
+  {
+    "id": "gk-magnetic-compass",
+    "prompt": "What tool is used to determine direction?",
+    "fillBlankPrompt": "A ______ is a tool used to determine direction.",
+    "answer": "Magnetic compass",
+    "choices": [
+      "Magnetic compass",
+      "Protractor",
+      "Pace counter",
+      "Map legend"
+    ],
+    "acceptedAnswers": [
+      "Compass",
+      "A magnetic compass"
     ]
   },
   {
@@ -861,7 +929,7 @@ window.GENERAL_KNOWLEDGE_DATA = [
   },
   {
     "id": "gk-aft-lane",
-    "prompt": "How many meters long is an AFT lane?",
+    "prompt": "How many meters long should a lane be on the AFT?",
     "answer": "25 meters",
     "choices": [
       "25 meters",
@@ -871,7 +939,7 @@ window.GENERAL_KNOWLEDGE_DATA = [
     ],
     "acceptedAnswers": [
       "25",
-      "Twenty-five meters"
+      "25m"
     ]
   },
   {
@@ -955,17 +1023,17 @@ window.GENERAL_KNOWLEDGE_DATA = [
   },
   {
     "id": "gk-freeze-halt",
-    "prompt": "What is the difference between Freeze and Halt?",
-    "answer": "Halt means stop but you may look around; Freeze means stop all motion and cut noise",
+    "prompt": "Which command tells Soldiers to stop all movement and remain silent?",
+    "fillBlankPrompt": "The command ______ tells Soldiers to stop all movement and remain silent.",
+    "answer": "Freeze",
     "choices": [
-      "Halt means stop but you may look around; Freeze means stop all motion and cut noise",
-      "Freeze means move faster; Halt means crawl",
-      "There is no difference",
-      "Halt cuts noise; Freeze allows normal movement"
+      "Freeze",
+      "Halt",
+      "Rally",
+      "Move Out"
     ],
     "acceptedAnswers": [
-      "Halt stop can look around freeze stop all motion cut noise",
-      "Halt means stop, freeze means stop all motion and cut noise"
+      "Freeze command"
     ]
   },
   {
@@ -1011,16 +1079,16 @@ window.GENERAL_KNOWLEDGE_DATA = [
   },
   {
     "id": "gk-left-lapel",
-    "prompt": "What goes on the left lapel of the AGSU?",
-    "answer": "MOS branch insignia",
+    "prompt": "What is worn on the left lapel of the AGSU?",
+    "answer": "Branch insignia",
     "choices": [
-      "MOS branch insignia",
+      "Branch insignia",
       "RDI",
       "Nameplate",
       "Unit awards"
     ],
     "acceptedAnswers": [
-      "Branch insignia",
+      "MOS branch insignia",
       "MOS insignia"
     ]
   },
