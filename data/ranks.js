@@ -14,7 +14,13 @@ window.RANK_DATA = [
     "requireGrade": true,
     "acceptedAnswers": [
       "PV1",
-         ]
+      "PVT",
+      "Private PV1",
+      "Private PVT",
+      "Private E-1",
+      "Private E1",
+      "Private 1"
+    ]
   },
   {
     "id": "rank-pv2",
@@ -309,10 +315,10 @@ window.RANK_DATA = [
   {
     "id": "rank-goa",
     "image": "images/ranks/goa.png",
-    "abbreviation": "GOA",
+    "abbreviation": "GA",
     "name": "General of the Army",
     "acceptedAnswers": [
-      "GOA",
+      "GA",
       "General of the Army",
       "General Of Army"
     ]
