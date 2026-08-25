@@ -70,15 +70,15 @@ window.LEADERSHIP_DATA = [
     acceptedAnswers: ["LTG Edmond Brown T2COM Commander"]
   },
   {
-    id: "raymond-harris",
-    image: "images/leadership/CSM Raymond Harris.png",
-    name: "Raymond Harris",
+    id: "alexander-kupratty",
+    image: "images/leadership/CSM Alexander Kupratty.png",
+    name: "Alexander Kupratty",
     rank: "CSM",
     position: "T2COM CSM",
     positionAliases: ["T2COM CSM", "T2COM Command Sergeant Major"],
     acceptedAnswers: [
-      "CSM Raymond Harris T2COM CSM",
-      "T2COM Command Sergeant Major Raymond Harris"
+      "CSM Alexander Kupratty T2COM CSM",
+      "T2COM Command Sergeant Major Alexander Kupratty"
     ]
   },
   {
@@ -113,14 +113,14 @@ window.LEADERSHIP_DATA = [
     image: "images/leadership/Col Benjamin Schneller.png",
     name: "Benjamin Schneller",
     rank: "COL",
-    position: "15th Sig BGE Commander",
+    position: "15th Sig BDE Commander",
     positionAliases: [
-      "15th Sig BGE Commander",
+      "15th Sig BDE Commander",
       "15th Signal Brigade Commander",
       "Brigade Commander"
     ],
     acceptedAnswers: [
-      "COL Benjamin Schneller 15th Sig BGE Commander",
+      "COL Benjamin Schneller 15th Sig BDE Commander",
       "Colonel Benjamin Schneller 15th Signal Brigade Commander"
     ]
   },
@@ -129,15 +129,15 @@ window.LEADERSHIP_DATA = [
     image: "images/leadership/CSM Nathaniel Piper.png",
     name: "Nathaniel Piper",
     rank: "CSM",
-    position: "15th Sig BGE CSM",
+    position: "15th Sig BDE CSM",
     positionAliases: [
-      "15th Sig BGE CSM",
+      "15th Sig BDE CSM",
       "15th Signal Brigade CSM",
       "Brigade CSM",
       "Brigade Command Sergeant Major"
     ],
     acceptedAnswers: [
-      "CSM Nathaniel Piper 15th Sig BGE CSM",
+      "CSM Nathaniel Piper 15th Sig BDE CSM",
       "CSM Nathaniel Piper 15th Signal Brigade CSM",
       "CSM Nathaniel Piper Brigade CSM"
     ]

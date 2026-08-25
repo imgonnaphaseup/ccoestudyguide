@@ -51,7 +51,7 @@ FINAL SECTION BEHAVIOR
 ----------------------
 Phase 6:
 - Sections 1 through 11
-- 228 total questions
+- 245 total questions
 - Leadership picture dropdown includes fake name/rank distractors
 - Army rank pictures are typed fill-in-the-blank questions
 - Rank answers accept abbreviations or full names
@@ -61,7 +61,7 @@ Phase 6:
 
 Phase 6+:
 - Sections 1 through 9
-- 187 total questions
+- 204 total questions
 - No Army Rank Picture Identification section
 - No SHARP/EO section
 - Unit-personnel questions remain in General Knowledge
@@ -84,3 +84,10 @@ AFTER INSTALLING
 3. Test Phase 6 and confirm the rank images appear.
 4. Test Phase 6+ and confirm Sections 10 and 11 are not present.
 5. Upload the changed files and new images/ranks folder to GitHub.
+
+CORRECTIONS IN THIS VERSION
+---------------------------
+- General Knowledge and True/False now match the latest instructor-provided sheet.
+- Ambush types are Point and Area only.
+- The hand signal displays Rally Point.
+- Keep the existing images/hand-signals/coil.png file; its filename is retained for compatibility.

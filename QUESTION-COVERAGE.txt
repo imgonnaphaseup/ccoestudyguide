@@ -2,61 +2,39 @@ QUESTION COVERAGE SUMMARY
 =========================
 
 Section 1 — Leadership Picture Identification: 15
-- Phase 6 dropdown now includes rank + full name and fake distractors.
-- Phase 6+ accepts last name or full name when rank/title and position are correct.
-
 Section 2 — Unit Mottos: 4
-- Brigade, Battalion, Company, and CCOE.
-
 Section 3 — Army Values and Warrior Ethos: 11
-- Seven Army Values and all four Warrior Ethos statements.
-
 Section 4 — Map Colors: 8
-- FM 3-25.26 map-color material.
-
 Section 5 — Terrain Features: 14
-- Four knowledge questions and ten picture-identification questions.
-
 Section 6 — Preparation Drill, Recovery Drill, MMD1, and MMD2: 30
-- Both mnemonics.
-- All 10 Preparation Drill exercises in order.
-- All 8 Recovery Drill exercises in order.
-- All MMD1 and MMD2 exercises in order.
-- Reference shown: ATP 7-22.02.
+Section 7 — General Knowledge True or False: 42
+Section 8 — General Knowledge: 71
+Section 9 — Hand-Signal Picture Identification: 9
+Section 10 — Army Rank Picture Identification: 29 (Phase 6 only)
+Section 11 — SHARP and EO: 12 (Phase 6 only)
 
-Section 7 — General Knowledge True or False: 29
-- All supplied true/false statements.
+LATEST STUDY-SHEET ADJUSTMENTS — 1 AUG 2026
+-------------------------------------------
+- Developmental counseling: DA Form 4856.
+- Fraternization example: an officer dating an NCO.
+- Open Ranks: the first rank takes 2 steps forward.
+- Shock sign: restlessness or confusion.
+- SALUTE displays Unit rather than Unit/Uniform.
+- Three D's display in the supplied order: Distance, Direction, Description.
+- Freeze is the command to stop all movement and remain silent.
+- Depression definition and magnetic-compass question added.
+- Weapon receipt answer accepts clear or check the weapon.
+- All 16 supplied True/False statements are included with the supplied answers.
+- Ambush types remain Point and Area only.
+- The hand signal now displays Rally Point; Rally remains accepted.
 
-Section 8 — General Knowledge: 68
-- Includes B-Co SDS, 1st PLT PSGs, 2nd PLT PSG, and B-Co XO.
-- Includes shock, tourniquet, camouflage, sideburns, formations, amnesty,
-  accountability, bugle calls, weapons, land navigation, phase requirements,
-  uniform questions, tape method, and all other supplied general knowledge.
+TOTAL QUESTIONS
+---------------
+Phase 6: 245
+Phase 6+: 204
 
-Section 9 — Hand-Signal Picture Identification: 8
-- Reference shown: TC 3-21.60.
-
-Section 10 — Army Rank Picture Identification: 29
-- Phase 6 only.
-- PV1 through SMA.
-- WO1 through CW5.
-- 2LT through General of the Army.
-- Typed answer; abbreviation or full rank name accepted.
-- Feedback shows full name and abbreviation.
-- Perfect score required: 29/29.
-
-Section 11 — SHARP and EO: 12
-- Phase 6 only.
-- AR 600-20.
-- SHARP meaning, categories, types, and lead.
-- EO meaning, protected groups, complaint types, complaint form, and EOLs.
-
-IMPLEMENTED ANSWER DECISIONS
-----------------------------
-- Uniform regulation: AR 670-1
-- Female ponytail: no more than 6 inches below the collar
-- Alternate EOL: SFC Johnson, Troy
-- Off-post sign-in: 2000
-- Taps question: 2100 or 2200
-- ACU pattern displayed as Operational Camouflage Pattern (OCP)
-  while the supplied “Occupational” wording is also accepted.
+LATEST SITE CORRECTIONS — 19 AUG 2026
+-------------------------------------
+- General of the Army abbreviation corrected to GA.
+- Main page now lists gggvgghjghjnvc@gmail.com for questions.
+- ALL-QUESTIONS.txt contains the complete current question bank and answers.
