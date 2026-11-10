@@ -31,13 +31,24 @@ window.LEADERSHIP_DATA = [
     acceptedAnswers: ["Honorable Pete Hegseth Secretary of Defense"]
   },
   {
-    id: "daniel-driscoll",
+    id: "adam-telle",
     image: "images/leadership/Honorable Daniel Driscoll.png",
-    name: "Daniel Driscoll",
+    name: "Adam Telle",
     rank: "Honorable",
     position: "Secretary of the Army",
     positionAliases: ["Secretary of the Army", "SECARMY", "Army Secretary"],
-    acceptedAnswers: ["Honorable Daniel Driscoll Secretary of the Army"]
+    acceptedAnswers: [
+      "Adam Telle",
+      "Honorable Adam Telle",
+      "HON Adam Telle",
+      "Hon Adam Telle",
+      "Honorable Adam Telle Secretary of the Army",
+      "HON Adam Telle Secretary of the Army",
+      "Hon Adam Telle Secretary of the Army",
+      "Honorable Adam Telle SECARMY",
+      "HON Adam Telle SECARMY",
+      "Hon Adam Telle SECARMY"
+    ]
   },
   {
     id: "christopher-laneve",
@@ -125,21 +136,29 @@ window.LEADERSHIP_DATA = [
     ]
   },
   {
-    id: "nathaniel-piper",
+    id: "stadler",
     image: "images/leadership/CSM Nathaniel Piper.png",
-    name: "Nathaniel Piper",
+    name: "Stadler",
     rank: "CSM",
     position: "15th Sig BDE CSM",
     positionAliases: [
       "15th Sig BDE CSM",
       "15th Signal Brigade CSM",
+      "15th Sig BDE Command Sergeant Major",
+      "15th Signal Brigade Command Sergeant Major",
       "Brigade CSM",
       "Brigade Command Sergeant Major"
     ],
     acceptedAnswers: [
-      "CSM Nathaniel Piper 15th Sig BDE CSM",
-      "CSM Nathaniel Piper 15th Signal Brigade CSM",
-      "CSM Nathaniel Piper Brigade CSM"
+      "CSM Stadler",
+      "Stadler",
+      "Command Sergeant Major Stadler",
+      "CSM Stadler 15th Sig BDE CSM",
+      "CSM Stadler 15th Signal Brigade CSM",
+      "CSM Stadler Brigade CSM",
+      "Command Sergeant Major Stadler 15th Sig BDE CSM",
+      "Command Sergeant Major Stadler 15th Signal Brigade CSM",
+      "Command Sergeant Major Stadler Brigade CSM"
     ]
   },
   {
